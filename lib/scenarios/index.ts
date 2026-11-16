@@ -1,9 +1,10 @@
 import type { Meters, Outcome, Scenario } from "./types";
 import { powerOutage } from "./power-outage";
 import { storm } from "./storm";
+import { flood } from "./flood";
 
 /** Levels, in order: level 1 opens when all six rooms are passed; each next level opens when the previous one is passed. */
-export const SCENARIOS: Scenario[] = [powerOutage, storm];
+export const SCENARIOS: Scenario[] = [powerOutage, storm, flood];
 export const getScenario = (id: string) => SCENARIOS.find((s) => s.id === id);
 
 export const START_METERS: Meters = { power: 70, food: 80, safety: 100 };
