@@ -157,3 +157,16 @@ a:hover .map-room .box,a:focus .map-room .box{filter:brightness(1.3)}
 .drag-ghost{position:fixed;transform:translate(-50%,-60%);font-size:38px;pointer-events:none;z-index:50;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6))}
 .fb.unsafe{border-color:var(--bad);background:rgba(232,96,76,.14)}
 .fb .best{margin-top:6px;color:var(--muted);font-size:13px}
+/* --- step 6: scenario --- */
+.room.scenario{border-color:rgba(242,169,59,.5);background:linear-gradient(135deg,rgba(242,169,59,.10),var(--panel))}
+.room.scenario.lock{opacity:.6;border-color:var(--line);background:var(--panel)}
+.meters{display:flex;flex-direction:column;gap:6px;margin:10px 0 14px;background:var(--panel2);border-radius:10px;padding:10px 12px}
+.meter-row{display:grid;grid-template-columns:96px 1fr;align-items:center;gap:10px;font-size:13px}
+.meter-row .track{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.meter-row .fill{height:100%;border-radius:4px;transition:width .6s}
+.timeline{margin-top:14px;display:flex;flex-direction:column;gap:6px}
+.tl{display:flex;gap:8px;font-size:13px;line-height:1.4;background:var(--panel2);border-radius:8px;padding:8px 10px;border-left:3px solid var(--good)}
+.tl.poor{border-left-color:var(--mid)}
+.tl.unsafe{border-left-color:var(--bad)}
+.tl b{color:var(--muted);font-weight:600}
+.review-links .btn{margin-top:8px}
