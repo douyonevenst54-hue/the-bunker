@@ -14,7 +14,7 @@ await page.getByRole("button", { name: "Start mission" }).click();
 // Stage 1: sort 12 items (answers don't matter here)
 for (let i = 0; i < 12; i++) {
   await page.locator(".bin").first().click();
-  await page.getByRole("button", { name: "Next" }).click();
+  await page.getByRole("button", { name: "Next", exact: true }).click();
 }
 ok(await page.locator(".place-plan").isVisible(), "placement board appears after Stage 1");
 ok((await page.locator(".tray-item").count()) === 4, "tray shows 4 items to place");
@@ -48,8 +48,8 @@ ok((await page.locator(".fb strong").innerText()).includes("Not quite"), "keyboa
 
 await page.locator(".tray-item").first().tap();
 await page.locator('[data-zone="2"]').tap();
-ok(await page.getByRole("button", { name: "Next" }).isVisible(), "Next appears when every item is placed");
-await page.getByRole("button", { name: "Next" }).click();
+ok(await page.getByRole("button", { name: "Next", exact: true }).isVisible(), "Next appears when every item is placed");
+await page.getByRole("button", { name: "Next", exact: true }).click();
 ok((await page.locator(".stage").first().innerText()).toUpperCase().includes("STAGE 3"), "moves on to Stage 3");
 
 // Kreyòl
