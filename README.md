@@ -19,6 +19,9 @@ Next.js (App Router) · TypeScript · Prisma · Neon PostgreSQL · Vercel
 - [x] Rooms 3–6: Security & Entrance, Food & Nutrition, Air & Ventilation, Energy & Electricity
 - [x] Power Outage cross-room scenario (unlocks after all six rooms)
 - [x] Admin panel: learning analytics, reviewed content edits (EN/HT) with audit log, expert sign-off shown to players
+- [x] Levels: each scenario unlocks the next. Level 2: Hurricane (before, during and after the storm)
+- [ ] Level 3: Flood · Level 4: Conflict / civil unrest · Level 5: Nuclear emergency (plus earthquake)
+- [ ] Free / subscription split and school licenses
 
 ## Develop
 ```bash

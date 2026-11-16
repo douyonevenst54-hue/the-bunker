@@ -2,6 +2,7 @@ import "server-only";
 import { prisma, dbEnabled } from "./db";
 import { ROOMS } from "./rooms";
 import { earnedBadgeIds, type AttemptLite } from "./badges";
+import { SCENARIO_IDS } from "./scenarios/ids";
 
 export interface RoomStatus {
   id: string;
@@ -80,5 +81,34 @@ export async function mergeGuestInto(guestId: string, accountId: string) {
       }
     }
     await tx.player.delete({ where: { id: guestId } });
+  });
+}
+
+export interface LevelStatus {
+  id: string;
+  level: number;
+  unlocked: boolean;
+  passed: boolean;
+  bestScore: number | null;
+}
+
+/** Scenario levels: level 1 needs all six rooms passed; each later level needs the one before it. */
+export async function getLevels(playerId: string | null): Promise<LevelStatus[]> {
+  const rooms = await getRoomStatuses(playerId);
+  let rows: { roomId: string; passed: boolean; bestScore: number }[] = [];
+  if (dbEnabled && playerId) {
+    try {
+      rows = await prisma.roomProgress.findMany({ where: { playerId, roomId: { in: [...SCENARIO_IDS] } } });
+    } catch (e) {
+      console.error("level lookup failed", e);
+    }
+  }
+  const by = new Map(rows.map((r) => [r.roomId, r]));
+  let prevOk = rooms.every((r) => r.passed);
+  return SCENARIO_IDS.map((id, i) => {
+    const r = by.get(id);
+    const st = { id, level: i + 1, unlocked: prevOk, passed: Boolean(r?.passed), bestScore: r?.bestScore ?? null };
+    prevOk = st.unlocked && st.passed;
+    return st;
   });
 }

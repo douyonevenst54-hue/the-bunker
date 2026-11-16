@@ -1,4 +1,7 @@
 import type { Tx } from "./rooms/types";
+import { SCENARIO_IDS } from "./scenarios/ids";
+
+const isScenario = (id: string) => (SCENARIO_IDS as readonly string[]).includes(id);
 
 /** What badge rules can look at: one entry per finished attempt, oldest first. */
 export interface AttemptLite {
@@ -68,6 +71,12 @@ export const BADGES: Badge[] = [
     earned: passedRoom("power-outage"),
   },
   {
+    id: "storm_survivor", emoji: "🌀",
+    name: { en: "Storm Survivor", ht: "Sivivan Siklòn" },
+    desc: { en: "Pass the Hurricane level", ht: "Reyisi nivo Siklòn nan" },
+    earned: passedRoom("storm"),
+  },
+  {
     id: "first_try", emoji: "🎯",
     name: { en: "Ready on Day One", ht: "Pare Depi Premye Jou" },
     desc: { en: "Pass a room on your first try", ht: "Reyisi yon chanm depi premye fwa" },
@@ -100,7 +109,7 @@ export const BADGES: Badge[] = [
     id: "bunker_complete", emoji: "🛡️",
     name: { en: "Bunker Commander", ht: "Kòmandan Bunker" },
     desc: { en: "Pass all six rooms", ht: "Reyisi tout sis chanm yo" },
-    earned: (a) => new Set(a.filter((x) => x.passed && x.roomId !== "power-outage").map((x) => x.roomId)).size >= 6,
+    earned: (a) => new Set(a.filter((x) => x.passed && !isScenario(x.roomId)).map((x) => x.roomId)).size >= 6,
   },
 ];
 
