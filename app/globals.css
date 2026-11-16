@@ -69,3 +69,31 @@ ul.check li:before{content:"☐";position:absolute;left:4px;top:8px;color:var(--
 .review-q .bad{color:var(--muted);font-size:13px;margin:2px 0}
 .review-q .ex{font-size:13px;color:var(--text);margin-top:6px;line-height:1.45}
 .navlink{display:block;text-align:center;margin-top:12px;color:var(--water);font-size:13px}
+/* --- app shell additions --- */
+a{color:inherit}
+header .right{display:flex;align-items:center;gap:8px}
+.acct{font:600 12px Inter,sans-serif;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:7px 12px;white-space:nowrap}
+.brand a{text-decoration:none}
+.status{margin-top:12px;font-size:13px;color:var(--muted);text-align:center}
+.critical{margin:14px 0 4px;border:1px solid var(--bad);background:rgba(232,96,76,.1);border-radius:12px;padding:12px 14px}
+.critical strong{color:var(--bad);display:block;margin-bottom:4px}
+.critical p{color:var(--text);font-size:14px}
+.critical li{font-size:13px;color:var(--text);margin:6px 0 0 18px;line-height:1.4}
+.rooms{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.room{display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;text-decoration:none}
+.room .ic{font-size:30px;width:40px;text-align:center}
+.room .mid{flex:1;min-width:0}
+.room .t{font-weight:700;font-size:16px}
+.room .s{font-size:13px;color:var(--muted);margin-top:3px}
+.room .go{font:700 13px Inter,sans-serif;background:var(--amber);color:#1a1205;border-radius:8px;padding:8px 12px;white-space:nowrap}
+.room.done{border-color:rgba(92,196,137,.5)}
+.room.lock{opacity:.5}
+.room.lock .go,.room.soon .go{background:var(--line);color:var(--muted)}
+.room.soon{opacity:.4}
+.meter{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:12px}
+.meter div{height:100%;background:var(--water)}
+.form label{display:block;font-size:13px;color:var(--muted);margin:12px 0 5px}
+.form input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--text);font:15px Inter,sans-serif;padding:12px}
+.err{color:var(--bad);font-size:14px;margin-top:10px}
+.switch{display:block;text-align:center;margin-top:14px;font-size:14px;color:var(--water);background:none;border:0;cursor:pointer;width:100%}
+.btn{text-align:center;text-decoration:none}
