@@ -77,6 +77,12 @@ export const BADGES: Badge[] = [
     earned: passedRoom("storm"),
   },
   {
+    id: "flood_survivor", emoji: "🌊",
+    name: { en: "Flood Survivor", ht: "Sivivan Inondasyon" },
+    desc: { en: "Pass the Flood level", ht: "Reyisi nivo Inondasyon an" },
+    earned: passedRoom("flood"),
+  },
+  {
     id: "first_try", emoji: "🎯",
     name: { en: "Ready on Day One", ht: "Pare Depi Premye Jou" },
     desc: { en: "Pass a room on your first try", ht: "Reyisi yon chanm depi premye fwa" },

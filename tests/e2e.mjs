@@ -134,6 +134,7 @@ ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merg
   ok((await p6.req("/scenario/power-outage")).status === 200, "scenario unlocks after all six rooms are passed");
   ok((await p6.req("/scenario/storm")).status !== 200, "level 2 (storm) stays locked until level 1 is passed");
   ok((await p6.req("/api/scenarios/storm/complete", { method: "POST", body: { answers: stormBest } })).status === 403, "level 2 can't be submitted while locked");
+  ok((await p6.req("/scenario/flood")).status !== 200, "level 3 (flood) stays locked until level 2 is passed");
   ok((await p6.req("/api/scenarios/power-outage/complete", { method: "POST", body: { answers: [0] } })).status === 400, "scenario: malformed answers rejected");
   const unsafeChoices = [...bestChoices]; const ui = outage.events.findIndex((ev) => ev.choices.some((c) => c.outcome === "unsafe"));
   unsafeChoices[ui] = outage.events[ui].choices.findIndex((c) => c.outcome === "unsafe");
@@ -155,6 +156,16 @@ ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merg
   const dash3 = await p6.req("/");
   ok(dash3.text.includes('href="/scenario/storm"') && dash3.text.includes("Level"), "dashboard lists the levels");
   ok((await p6.req("/scenario/storm/review")).status === 200, "storm review page loads");
+  // Level 3 opens only after level 2
+  const flood = SCENARIOS.find((x) => x.id === "flood");
+  const floodBest = flood.events.map((ev) => ev.choices.findIndex((c) => c.outcome === "best"));
+  ok((await p6.req("/scenario/flood")).status === 200, "level 3 (flood) unlocks after level 2 is passed");
+  const fu = [...floodBest]; const fi = flood.events.findIndex((ev) => ev.choices.some((c) => c.outcome === "unsafe"));
+  fu[fi] = flood.events[fi].choices.findIndex((c) => c.outcome === "unsafe");
+  let fl = await p6.req("/api/scenarios/flood/complete", { method: "POST", body: { answers: fu } });
+  ok(fl.json?.result?.passed === false && fl.json.result.criticalMisses.length === 1, "flood: an unsafe choice blocks passing");
+  fl = await p6.req("/api/scenarios/flood/complete", { method: "POST", body: { answers: floodBest } });
+  ok(fl.json?.result?.score === 100 && fl.json.result.passed && fl.json.newBadges.includes("flood_survivor"), "flood: best choices pass and earn Flood Survivor");
 }
 
 // Admin & safety review
