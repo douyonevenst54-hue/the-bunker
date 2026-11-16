@@ -15,7 +15,8 @@ Next.js (App Router) · TypeScript · Prisma · Neon PostgreSQL · Vercel
 - [x] Critical safety errors block unlocking (a high score can't hide them)
 - [x] Bunker floor-plan map and badges
 - [x] Forgot password (bilingual email via Resend, 1-hour one-time links)
-- [ ] Drag-and-drop placement, Rooms 3–6, Power Outage scenario, admin + safety review
+- [x] Drag-and-drop placement (correct / incorrect / unsafe; drag, tap, or keyboard)
+- [ ] Rooms 3–6, Power Outage scenario, admin + safety review, Rooms 3–6, Power Outage scenario, admin + safety review
 
 ## Develop
 ```bash
@@ -24,7 +25,7 @@ cp .env.example .env   # DATABASE_URL, AUTH_SECRET
 npm run migrate:dev    # schema changes: prisma migrate dev only, never db push
 npm run dev
 ```
-Tests: `DATABASE_URL=... ./tests/run-e2e.sh` (fresh database, production build, end-to-end checks).
+Tests: `DATABASE_URL=... ./tests/run-e2e.sh` (fresh database, production build, API checks). Add `UI_TESTS=1` with Playwright installed for real-browser drag-and-drop tests.
 Expert content review: `/room/<id>/review`.
 
 Safety content is checked against EPA, FEMA/Ready.gov, CDC, AHA and American Red Cross guidance and reviewed by Dr. Jhon Evenst Douyon, MD, MPH.
