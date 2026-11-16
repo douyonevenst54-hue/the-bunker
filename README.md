@@ -18,7 +18,7 @@ Next.js (App Router) · TypeScript · Prisma · Neon PostgreSQL · Vercel
 - [x] Drag-and-drop placement (correct / incorrect / unsafe; drag, tap, or keyboard)
 - [x] Rooms 3–6: Security & Entrance, Food & Nutrition, Air & Ventilation, Energy & Electricity
 - [x] Power Outage cross-room scenario (unlocks after all six rooms)
-- [ ] Admin + safety review panel
+- [x] Admin panel: learning analytics, reviewed content edits (EN/HT) with audit log, expert sign-off shown to players
 
 ## Develop
 ```bash
@@ -32,3 +32,9 @@ Expert content review: `/room/<id>/review`.
 
 Safety content is checked against EPA, FEMA/Ready.gov, CDC, AHA and American Red Cross guidance and reviewed by Dr. Jhon Evenst Douyon, MD, MPH.
 For education only, not professional certification.
+
+## Admin
+Accounts whose email is in `ADMIN_EMAILS` (Vercel env, comma-separated) see an **Admin** link.
+- `/admin`: players, pass rates, average scores, critical errors and most-missed questions per room.
+- `/admin/content/<id>`: edit any English or Kreyòl text. Edits are pending until approved; approved edits reach players immediately; every change is logged. Answer keys change only in code.
+- Sign off a room once reviewed. Players see "Content reviewed by … · date".
