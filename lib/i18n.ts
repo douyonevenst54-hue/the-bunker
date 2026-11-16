@@ -27,7 +27,7 @@ const en = {
   reviewedBy: "Content reviewed by", admin: "Admin",
   scenario: "Scenario", mPower: "Power", mFood: "Food", mSafety: "Safety", couldBeBetter: "Could be better",
   debrief: "Debrief", scenarioCritical: "At least one choice could have cost a life. Read the explanations, then try the scenario again.",
-  reviewRooms: "Review these rooms to sharpen your skills:", scenarioLocked: "Pass all six rooms to unlock", scenarioOpen: "Put all six rooms to the test",
+  reviewRooms: "Review these rooms to sharpen your skills:", scenarioLocked: "Pass all six rooms to unlock", scenarioOpen: "Put all six rooms to the test", levels: "Levels", level: "Level", levelLocked: "Pass level {n} to unlock",
   badges: "Badges", continueWith: "Continue", newBadges: "New badge earned!",
   // account
   account: "Account", createAccount: "Create free account", signIn: "Sign in", signOut: "Sign out",
@@ -70,7 +70,7 @@ const ht: typeof en = {
   reviewedBy: "Kontni revize pa", admin: "Admin",
   scenario: "Senaryo", mPower: "Kouran", mFood: "Manje", mSafety: "Sekirite", couldBeBetter: "Te ka pi bon",
   debrief: "Rezime", scenarioCritical: "Omwen yon chwa te ka koute yon lavi. Li esplikasyon yo, epi eseye senaryo a ankò.",
-  reviewRooms: "Revize chanm sa yo pou amelyore konesans ou:", scenarioLocked: "Reyisi tout sis chanm yo pou debloke l", scenarioOpen: "Mete tout sis chanm yo aleprèv",
+  reviewRooms: "Revize chanm sa yo pou amelyore konesans ou:", scenarioLocked: "Reyisi tout sis chanm yo pou debloke l", scenarioOpen: "Mete tout sis chanm yo aleprèv", levels: "Nivo yo", level: "Nivo", levelLocked: "Reyisi nivo {n} pou debloke l",
   badges: "Badj", continueWith: "Kontinye", newBadges: "Nouvo badj!",
   account: "Kont", createAccount: "Kreye kont gratis", signIn: "Konekte", signOut: "Dekonekte",
   email: "Imèl", password: "Modpas (8 karaktè oswa plis)", name: "Prenon (si ou vle)",

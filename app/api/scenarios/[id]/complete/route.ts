@@ -3,7 +3,7 @@ import type { Prisma } from "@prisma/client";
 import { getScenario, scoreScenario, validateScenarioAnswers } from "@/lib/scenarios";
 import { prisma, dbEnabled } from "@/lib/db";
 import { getPlayer } from "@/lib/session";
-import { getBadgeIds, getRoomStatuses } from "@/lib/progress";
+import { getBadgeIds, getLevels } from "@/lib/progress";
 
 /** Scenario results are scored on the server and stored like room attempts (roomId = scenario id). */
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -13,9 +13,9 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   if (!dbEnabled) return NextResponse.json({ error: "Saving is not enabled" }, { status: 503 });
 
   const player = await getPlayer();
-  const statuses = await getRoomStatuses(player?.id ?? null);
-  if (!player || !statuses.every((s) => s.passed)) {
-    return NextResponse.json({ error: "Pass all six rooms first" }, { status: 403 });
+  const level = (await getLevels(player?.id ?? null)).find((l) => l.id === id);
+  if (!player || !level?.unlocked) {
+    return NextResponse.json({ error: "This level is locked" }, { status: 403 });
   }
 
   let answers: number[];

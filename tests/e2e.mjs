@@ -31,6 +31,8 @@ const water = ROOMS.find((r) => r.id === "water");
 const { SCENARIOS } = await import("../.test-build/scenarios.mjs");
 const outage = SCENARIOS[0];
 const bestChoices = outage.events.map((ev) => ev.choices.findIndex((c) => c.outcome === "best"));
+const storm = SCENARIOS.find((x) => x.id === "storm");
+const stormBest = storm.events.map((ev) => ev.choices.findIndex((c) => c.outcome === "best"));
 const best = (S) => S.kind === "place" ? S.items.map((it) => S.zones.findIndex((z) => it.ok.includes(z.id))) : S.qs.map((q) => q.a);
 const perfect = (room) => ({ sort: room.items.map((i) => i.b), stages: Object.fromEntries(room.stages.map((S) => [S.key, best(S)])) });
 const withUnsafePlacement = (room) => {
@@ -130,6 +132,8 @@ ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merg
   for (const r of ROOMS) { const rv = await p6.req(`/room/${r.id}/review`); if (rv.status !== 200) ok(false, "review page " + r.id); }
   ok(true, "review pages load for all six rooms");
   ok((await p6.req("/scenario/power-outage")).status === 200, "scenario unlocks after all six rooms are passed");
+  ok((await p6.req("/scenario/storm")).status !== 200, "level 2 (storm) stays locked until level 1 is passed");
+  ok((await p6.req("/api/scenarios/storm/complete", { method: "POST", body: { answers: stormBest } })).status === 403, "level 2 can't be submitted while locked");
   ok((await p6.req("/api/scenarios/power-outage/complete", { method: "POST", body: { answers: [0] } })).status === 400, "scenario: malformed answers rejected");
   const unsafeChoices = [...bestChoices]; const ui = outage.events.findIndex((ev) => ev.choices.some((c) => c.outcome === "unsafe"));
   unsafeChoices[ui] = outage.events[ui].choices.findIndex((c) => c.outcome === "unsafe");
@@ -141,6 +145,16 @@ ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merg
   ok(dash2.text.includes('href="/scenario/power-outage"') && dash2.text.includes("100/100"), "dashboard shows the passed scenario");
   const anon = await new Client().req("/api/scenarios/power-outage/complete", { method: "POST", body: { answers: bestChoices } });
   ok(anon.status === 403, "scenario can't be submitted by a player who hasn't passed the rooms");
+  ok((await p6.req("/scenario/storm")).status === 200, "level 2 (storm) unlocks after level 1 is passed");
+  const stormUnsafe = [...stormBest]; const su = storm.events.findIndex((ev) => ev.choices.some((c) => c.outcome === "unsafe"));
+  stormUnsafe[su] = storm.events[su].choices.findIndex((c) => c.outcome === "unsafe");
+  let st = await p6.req("/api/scenarios/storm/complete", { method: "POST", body: { answers: stormUnsafe } });
+  ok(st.json?.result?.passed === false && st.json.result.criticalMisses.length === 1, "storm: an unsafe choice blocks passing");
+  st = await p6.req("/api/scenarios/storm/complete", { method: "POST", body: { answers: stormBest } });
+  ok(st.json?.result?.score === 100 && st.json.result.passed && st.json.newBadges.includes("storm_survivor") && !st.json.newBadges.includes("bunker_complete"), "storm: best choices pass and earn Storm Survivor");
+  const dash3 = await p6.req("/");
+  ok(dash3.text.includes('href="/scenario/storm"') && dash3.text.includes("Level"), "dashboard lists the levels");
+  ok((await p6.req("/scenario/storm/review")).status === 200, "storm review page loads");
 }
 
 // Admin & safety review

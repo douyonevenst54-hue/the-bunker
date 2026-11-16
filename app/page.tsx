@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { ROOMS, COMING_SOON } from "@/lib/rooms";
 import { asLang, LANG_COOKIE, STRINGS } from "@/lib/i18n";
 import { getPlayer } from "@/lib/session";
-import { getRoomStatuses, getBadgeIds, getScenarioProgress } from "@/lib/progress";
+import { getRoomStatuses, getBadgeIds, getLevels } from "@/lib/progress";
 import { SCENARIOS } from "@/lib/scenarios";
 import BunkerMap from "@/components/BunkerMap";
 import BadgeShelf from "@/components/BadgeShelf";
@@ -14,13 +14,11 @@ export default async function Bunker() {
   const lang = asLang((await cookies()).get(LANG_COOKIE)?.value);
   const s = STRINGS[lang];
   const player = await getPlayer().catch(() => null);
-  const sc = SCENARIOS[0];
-  const [statuses, badges, scProg] = await Promise.all([
+  const [statuses, badges, levels] = await Promise.all([
     getRoomStatuses(player?.id ?? null),
     getBadgeIds(player?.id ?? null),
-    getScenarioProgress(player?.id ?? null, sc.id),
+    getLevels(player?.id ?? null),
   ]);
-  const scOpen = statuses.every((r) => r.passed);
   const total = ROOMS.length + COMING_SOON.length;
   const passed = statuses.filter((r) => r.passed).length;
   const nextUp = statuses.find((r) => r.unlocked && !r.passed);
@@ -47,19 +45,28 @@ export default async function Bunker() {
         </div>
       </div>
 
-      {scOpen ? (
-        <Link className={`room scenario ${scProg?.passed ? "done" : ""}`} href={`/scenario/${sc.id}`} style={{ marginTop: 14 }}>
-          <div className="ic">{sc.emoji}</div>
-          <div className="mid"><div className="t">{sc.title[lang]}</div>
-            <div className="s">{scProg ? `${scProg.passed ? "✅ " + s.statusPassed + " · " : ""}${s.best} ${scProg.bestScore}/100` : s.scenarioOpen}</div></div>
-          <div className="go">{scProg ? s.replay : s.play_}</div>
-        </Link>
-      ) : (
-        <div className="room scenario lock" style={{ marginTop: 14 }}>
-          <div className="ic">🔒</div>
-          <div className="mid"><div className="t">{sc.title[lang]}</div><div className="s">{s.scenarioLocked} · {passed}/6</div></div>
-        </div>
-      )}
+      <div className="stage" style={{ marginTop: 18 }}>{s.levels}</div>
+      {levels.map((lv) => {
+        const sc = SCENARIOS.find((x) => x.id === lv.id)!;
+        const name = `${s.level} ${lv.level} · ${sc.title[lang].replace(/^[^:]*:\s*/, "")}`;
+        if (!lv.unlocked) {
+          const why = lv.level === 1 ? `${s.scenarioLocked} · ${passed}/6` : s.levelLocked.replace("{n}", String(lv.level - 1));
+          return (
+            <div key={lv.id} className="room scenario lock" style={{ marginTop: 10 }}>
+              <div className="ic">🔒</div>
+              <div className="mid"><div className="t">{name}</div><div className="s">{why}</div></div>
+            </div>
+          );
+        }
+        return (
+          <Link key={lv.id} className={`room scenario ${lv.passed ? "done" : ""}`} href={`/scenario/${sc.id}`} style={{ marginTop: 10 }}>
+            <div className="ic">{sc.emoji}</div>
+            <div className="mid"><div className="t">{name}</div>
+              <div className="s">{lv.bestScore !== null ? `${lv.passed ? "✅ " + s.statusPassed + " · " : ""}${s.best} ${lv.bestScore}/100` : s.scenarioOpen}</div></div>
+            <div className="go">{lv.bestScore !== null ? s.replay : s.play_}</div>
+          </Link>
+        );
+      })}
 
       <BadgeShelf lang={lang} earned={badges} />
 
