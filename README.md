@@ -22,7 +22,8 @@ Next.js (App Router) · TypeScript · Prisma · Neon PostgreSQL · Vercel
 - [x] Levels: each scenario unlocks the next. Level 2: Hurricane (before, during and after the storm)
 - [x] Level 3: Flood (watch, flash flood, return home, food, wells, mold, wiring)
 - [ ] Level 4: Conflict / civil unrest · Level 5: Nuclear emergency (plus earthquake)
-- [ ] Free / subscription split and school licenses
+- [x] Free / subscription split: Rooms 1–2 free; members ($2.99/mo or $24.99/yr via Stripe) get rooms 3–6 and every level
+- [ ] School / organization licenses
 
 ## Develop
 ```bash
@@ -42,3 +43,10 @@ Accounts whose email is in `ADMIN_EMAILS` (Vercel env, comma-separated) see an *
 - `/admin`: players, pass rates, average scores, critical errors and most-missed questions per room.
 - `/admin/content/<id>`: edit any English or Kreyòl text. Edits are pending until approved; approved edits reach players immediately; every change is logged. Answer keys change only in code.
 - Sign off a room once reviewed. Players see "Content reviewed by … · date".
+
+## Memberships (Stripe)
+The paywall turns on by itself once these Vercel env vars are set (until then everything stays open):
+`STRIPE_SECRET_KEY`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_WEBHOOK_SECRET`.
+Webhook endpoint: `https://buildthebunker.com/api/billing/webhook` with events `checkout.session.completed`,
+`customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`.
+Admins are always members. Free rooms are listed in `lib/plan.ts` (`FREE_ROOMS`).

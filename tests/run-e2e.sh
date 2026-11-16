@@ -12,10 +12,10 @@ npm run build
 npx -y esbuild@0.25 lib/rooms/index.ts --bundle --format=esm --platform=node --outfile=.test-build/rooms.mjs --log-level=warning
 npx -y esbuild@0.25 lib/scenarios/index.ts --bundle --format=esm --platform=node --outfile=.test-build/scenarios.mjs --log-level=warning
 
-ADMIN_EMAILS=admin@example.com EMAIL_DEV_LOG=1 APP_URL=http://localhost:3000 RESEND_API_KEY= PORT=3000 npm start > /tmp/next.log 2>&1 &
+PAYWALL=on STRIPE_WEBHOOK_SECRET=whsec_test_bunker ADMIN_EMAILS=admin@example.com EMAIL_DEV_LOG=1 APP_URL=http://localhost:3000 RESEND_API_KEY= PORT=3000 npm start > /tmp/next.log 2>&1 &
 SERVER=$!
 trap 'kill $SERVER 2>/dev/null || true' EXIT
 for i in $(seq 1 60); do curl -sf http://localhost:3000/ >/dev/null && break; sleep 1; done
 
-node tests/e2e.mjs
+STRIPE_WEBHOOK_SECRET=whsec_test_bunker node tests/e2e.mjs
 if [ "${UI_TESTS:-0}" = "1" ]; then node tests/ui-place.mjs && node tests/ui-scenario.mjs; fi

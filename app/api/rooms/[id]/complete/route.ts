@@ -5,6 +5,7 @@ import { scoreRoom, validateAnswers } from "@/lib/scoring";
 import { prisma, dbEnabled } from "@/lib/db";
 import { getOrCreatePlayer } from "@/lib/session";
 import { getBadgeIds } from "@/lib/progress";
+import { needsPlan } from "@/lib/plan";
 
 /** The client sends raw answers; the server scores them. The client never sets the score. */
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -23,6 +24,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   const result = scoreRoom(room, answers);
   try {
     const player = await getOrCreatePlayer();
+    if (needsPlan(room.id, player)) return NextResponse.json({ error: "membersOnly" }, { status: 402 });
     const before = new Set(await getBadgeIds(player.id));
     const now = new Date();
     await prisma.$transaction(async (tx) => {

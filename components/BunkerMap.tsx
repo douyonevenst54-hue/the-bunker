@@ -3,7 +3,7 @@ import { ROOMS, COMING_SOON, MAP_LAYOUT } from "@/lib/rooms";
 import type { RoomStatus } from "@/lib/progress";
 import { STRINGS } from "@/lib/i18n";
 
-type Kind = "passed" | "open" | "locked" | "soon";
+type Kind = "passed" | "open" | "locked" | "soon" | "premium";
 
 const W = 360, ROOM_W = 124, ROOM_H = 118, TOP = 70, GAP = 14;
 const CORR_X = 145, CORR_W = 70;
@@ -19,7 +19,7 @@ function lines(name: string): string[] {
   return mid > 0 ? [name.slice(0, mid), name.slice(mid + 1)] : [name];
 }
 
-export default function BunkerMap({ lang, statuses }: { lang: Lang; statuses: RoomStatus[] }) {
+export default function BunkerMap({ lang, statuses, premium = [] }: { lang: Lang; statuses: RoomStatus[]; premium?: string[] }) {
   const s = STRINGS[lang];
   const H = TOP + 3 * ROOM_H + 2 * GAP + 30;
 
@@ -27,12 +27,12 @@ export default function BunkerMap({ lang, statuses }: { lang: Lang; statuses: Ro
     const room = ROOMS.find((r) => r.id === slot.id);
     const st = statuses.find((x) => x.id === slot.id);
     const soon = COMING_SOON.find((c) => c.id === slot.id);
-    const kind: Kind = !room ? "soon" : !st?.unlocked ? "locked" : st.passed ? "passed" : "open";
+    const kind: Kind = !room ? "soon" : !st?.unlocked ? "locked" : premium.includes(slot.id) ? "premium" : st.passed ? "passed" : "open";
     const name = room ? room.ui[lang].room.replace(/^[^·]*·\s*/, "") : soon!.name[lang];
     const emoji = room ? room.emoji : soon!.emoji;
     const status = kind === "passed" ? `✓ ${st!.bestScore}/100`
       : kind === "open" ? (st?.played ? `${s.best} ${st.bestScore} · ${s.replay}` : `▶ ${s.play_}`)
-      : kind === "locked" ? `🔒 ${s.locked}` : s.comingSoon;
+      : kind === "locked" ? `🔒 ${s.locked}` : kind === "premium" ? `💎 ${s.membersOnly}` : s.comingSoon;
     const x = slot.side === "left" ? CORR_X - 12 - ROOM_W : CORR_X + CORR_W + 12;
     const y = TOP + slot.row * (ROOM_H + GAP);
     return { ...slot, room, kind, name, emoji, status, x, y, n: room?.n };
@@ -68,7 +68,9 @@ export default function BunkerMap({ lang, statuses }: { lang: Lang; statuses: Ro
             <text x={r.x + ROOM_W / 2} y={r.y + ROOM_H - 12} textAnchor="middle" className="map-status">{r.status}</text>
           </g>
         );
-        return r.kind === "open" || r.kind === "passed"
+        return r.kind === "premium"
+          ? <a key={r.id} href="/upgrade" aria-label={`${r.name}: ${r.status}`}>{content}</a>
+          : r.kind === "open" || r.kind === "passed"
           ? <a key={r.id} href={`/room/${r.id}`} aria-label={`${r.name}: ${r.status}`}>{content}</a>
           : <g key={r.id} aria-label={`${r.name}: ${r.status}`}>{content}</g>;
       })}

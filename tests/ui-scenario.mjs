@@ -10,6 +10,8 @@ const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
 const page = await ctx.newPage();
 await page.goto(BASE + "/");
+// Levels are for members; the admin account (created by e2e.mjs) counts as a member.
+await page.evaluate(async () => { await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: "admin@example.com", password: "adminpass1" }) }); });
 for (const room of ROOMS) {
   await page.evaluate(async ([id, answers]) => { await fetch(`/api/rooms/${id}/complete`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ answers }) }); },
     [room.id, { sort: room.items.map((i) => i.b), stages: Object.fromEntries(room.stages.map((S) => [S.key, best(S)])) }]);

@@ -1,4 +1,6 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { getPlayer } from "@/lib/session";
+import { needsPlan } from "@/lib/plan";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { liveRoom } from "@/lib/content";
@@ -9,6 +11,7 @@ export default async function Review({ params }: { params: Promise<{ id: string 
   const { id } = await params;
   const room = await liveRoom(id);
   if (!room) notFound();
+  if (needsPlan(id, await getPlayer().catch(() => null))) redirect("/upgrade");
   const lang = asLang((await cookies()).get(LANG_COOKIE)?.value);
   const s = STRINGS[lang];
   const bin = { u: `✅ ${s.use}`, s: `➖ ${s.skip}`, a: `⚠️ ${s.avoid}` };
