@@ -93,6 +93,35 @@ ok(r.status === 200, "login works");
 ok(sql(`select count(*) from \\\"RoomProgress\\\" where \\\"playerId\\\"='${guestId}'`) === "2", "guest progress merged into account on login");
 ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merged guest record removed");
 
+// Forgot password
+const { readFileSync } = await import("node:fs");
+const lastToken = () => [...readFileSync(process.env.NEXT_LOG || "/tmp/next.log", "utf8").matchAll(/reset\?token=([A-Za-z0-9_-]+)/g)].pop()?.[1];
+const anon = new Client();
+r = await anon.req("/forgot"); ok(r.status === 200, "forgot page loads");
+r = await anon.req("/api/auth/forgot", { method: "POST", body: { email: "nobody@example.com" } });
+ok(r.status === 200 && r.json?.ok && !lastToken(), "unknown email: same answer, no email sent");
+r = await anon.req("/api/auth/forgot", { method: "POST", body: { email: "TEST@example.com", lang: "ht" } });
+await new Promise((res) => setTimeout(res, 300));
+const tok = lastToken();
+ok(r.json?.ok && !!tok, "known email: reset link emailed");
+ok(readFileSync("/tmp/next.log", "utf8").includes("Chanje modpas THE BUNKER ou"), "email subject follows the player's language (Kreyòl)");
+ok(sql("select count(*) from \\\"PasswordResetToken\\\" where \\\"tokenHash\\\" = '" + tok + "'") === "0", "raw token is not stored (only its hash)");
+r = await anon.req("/reset?token=" + tok); ok(r.status === 200, "reset page loads");
+r = await anon.req("/api/auth/reset", { method: "POST", body: { token: tok, password: "short" } });
+ok(r.status === 400 && r.json?.error === "errPassword", "reset: short password rejected");
+r = await anon.req("/api/auth/reset", { method: "POST", body: { token: "bogus", password: "brandnew123" } });
+ok(r.status === 400 && r.json?.error === "errResetLink", "reset: bad token rejected");
+r = await anon.req("/api/auth/reset", { method: "POST", body: { token: tok, password: "brandnew123" } });
+ok(r.status === 200 && anon.cookies.has("bunker_session"), "reset works and signs the player in");
+r = await anon.req("/api/auth/reset", { method: "POST", body: { token: tok, password: "another1234" } });
+ok(r.status === 400, "reset link can't be used twice");
+r = await new Client().req("/api/auth/login", { method: "POST", body: { email: "test@example.com", password: "longenough1" } });
+ok(r.status === 401, "old password no longer works");
+r = await new Client().req("/api/auth/login", { method: "POST", body: { email: "test@example.com", password: "brandnew123" } });
+ok(r.status === 200, "new password works");
+for (let i = 0; i < 4; i++) await anon.req("/api/auth/forgot", { method: "POST", body: { email: "test@example.com" } });
+ok(Number(sql("select count(*) from \\\"PasswordResetToken\\\" where \\\"createdAt\\\" > now() - interval '1 hour'")) <= 3, "reset emails limited to 3 per hour");
+
 r = await g2.req("/api/auth/logout", { method: "POST" });
 ok(!g2.cookies.has("bunker_session"), "logout clears the session");
 

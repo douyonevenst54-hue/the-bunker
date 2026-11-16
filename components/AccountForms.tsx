@@ -59,6 +59,7 @@ export default function AccountForms({ email, name }: { email: string | null; na
         {err && <div className="err">{t(err)}</div>}
         <button className="btn" disabled={busy}>{busy ? "…" : mode === "register" ? t("createAccount") : t("signIn")}</button>
       </form>
+      {mode === "login" && <Link className="switch" href="/forgot">{t("forgotLink")}</Link>}
       <button className="switch" onClick={() => { setErr(null); setMode(mode === "register" ? "login" : "register"); }}>
         {mode === "register" ? `${t("haveAccount")} ${t("signIn")}` : `${t("noAccount")} ${t("createAccount")}`}
       </button>

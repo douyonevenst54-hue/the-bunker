@@ -30,6 +30,12 @@ const en = {
   errEmail: "Enter a valid email.", errPassword: "Password must be at least 8 characters.",
   errTaken: "An account with this email already exists. Sign in instead.", errLogin: "Wrong email or password.",
   errServer: "Something went wrong. Please try again.",
+  forgotLink: "Forgot password?", forgotTitle: "Reset your password",
+  forgotSub: "Enter the email you signed up with. We'll send you a link to choose a new password.",
+  forgotSent: "If an account exists for that email, a reset link is on its way. Check your inbox (and spam). The link works for 1 hour.",
+  sendLink: "Send reset link", resetTitle: "Choose a new password",
+  newPassword: "New password (8+ characters)", confirmPassword: "Type it again", savePassword: "Save and sign in",
+  errMatch: "The two passwords don't match.", errResetLink: "This reset link is invalid or has expired. Ask for a new one.",
 };
 
 const ht: typeof en = {
@@ -60,6 +66,12 @@ const ht: typeof en = {
   errEmail: "Antre yon imèl ki valab.", errPassword: "Modpas la dwe gen omwen 8 karaktè.",
   errTaken: "Gen yon kont ak imèl sa a deja. Konekte pito.", errLogin: "Imèl oswa modpas la pa bon.",
   errServer: "Gen yon bagay ki pa mache. Tanpri eseye ankò.",
+  forgotLink: "Ou bliye modpas ou?", forgotTitle: "Chanje modpas ou",
+  forgotSub: "Antre imèl ou te sèvi pou kreye kont lan. N ap voye yon lyen ba ou pou chwazi yon nouvo modpas.",
+  forgotSent: "Si gen yon kont pou imèl sa a, yon lyen ap vini. Gade bwat imèl ou (ak espam). Lyen an bon pou 1 èdtan.",
+  sendLink: "Voye lyen an", resetTitle: "Chwazi yon nouvo modpas",
+  newPassword: "Nouvo modpas (8 karaktè oswa plis)", confirmPassword: "Tape l ankò", savePassword: "Sere epi konekte",
+  errMatch: "De modpas yo pa menm.", errResetLink: "Lyen sa a pa bon ankò oswa li ekspire. Mande yon lòt.",
 };
 
 export const STRINGS: Record<Lang, typeof en> = { en, ht };
