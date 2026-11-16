@@ -29,6 +29,14 @@ export async function getRoomStatuses(playerId: string | null): Promise<RoomStat
   });
 }
 
+/** Best result for a scenario (stored in RoomProgress under the scenario id). */
+export async function getScenarioProgress(playerId: string | null, id: string) {
+  if (!dbEnabled || !playerId) return null;
+  try {
+    return await prisma.roomProgress.findUnique({ where: { playerId_roomId: { playerId, roomId: id } } });
+  } catch { return null; }
+}
+
 /** Attempt history (oldest first) used for badges. */
 export async function getAttempts(playerId: string | null): Promise<AttemptLite[]> {
   if (!dbEnabled || !playerId) return [];

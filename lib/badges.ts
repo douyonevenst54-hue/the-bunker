@@ -62,6 +62,12 @@ export const BADGES: Badge[] = [
     earned: passedRoom("energy"),
   },
   {
+    id: "outage_survivor", emoji: "⚡",
+    name: { en: "Outage Survivor", ht: "Sivivan Blakawout" },
+    desc: { en: "Pass the Power Outage scenario", ht: "Reyisi senaryo Koupi Kouran an" },
+    earned: passedRoom("power-outage"),
+  },
+  {
     id: "first_try", emoji: "🎯",
     name: { en: "Ready on Day One", ht: "Pare Depi Premye Jou" },
     desc: { en: "Pass a room on your first try", ht: "Reyisi yon chanm depi premye fwa" },
@@ -94,7 +100,7 @@ export const BADGES: Badge[] = [
     id: "bunker_complete", emoji: "🛡️",
     name: { en: "Bunker Commander", ht: "Kòmandan Bunker" },
     desc: { en: "Pass all six rooms", ht: "Reyisi tout sis chanm yo" },
-    earned: (a) => new Set(a.filter((x) => x.passed).map((x) => x.roomId)).size >= 6,
+    earned: (a) => new Set(a.filter((x) => x.passed && x.roomId !== "power-outage").map((x) => x.roomId)).size >= 6,
   },
 ];
 

@@ -28,6 +28,9 @@ class Client {
 // Answers built from the real content
 const { ROOMS } = await import("../.test-build/rooms.mjs");
 const water = ROOMS.find((r) => r.id === "water");
+const { SCENARIOS } = await import("../.test-build/scenarios.mjs");
+const outage = SCENARIOS[0];
+const bestChoices = outage.events.map((ev) => ev.choices.findIndex((c) => c.outcome === "best"));
 const best = (S) => S.kind === "place" ? S.items.map((it) => S.zones.findIndex((z) => it.ok.includes(z.id))) : S.qs.map((q) => q.a);
 const perfect = (room) => ({ sort: room.items.map((i) => i.b), stages: Object.fromEntries(room.stages.map((S) => [S.key, best(S)])) });
 const withUnsafePlacement = (room) => {
@@ -46,6 +49,10 @@ ok(r.status === 200 && r.text.includes("bunker-map") && r.text.includes("Water")
 ok(r.text.includes('href="/room/water"') && !r.text.includes('href="/room/medical"'), "map: Room 1 is clickable, Room 2 is not");
 r = await g.req("/room/medical");
 ok(r.status === 307 || r.status === 303 || r.status === 302, "Room 2 is locked for a new visitor (redirects)");
+r = await g.req("/scenario/power-outage");
+ok(r.status !== 200, "scenario is locked for a new visitor");
+r = await g.req("/scenario/power-outage/review");
+ok(r.status === 200 && r.text.includes("⚠️"), "scenario review page loads with critical markers");
 r = await g.req("/medical");
 ok(r.status === 308 && r.location?.endsWith("/room/medical"), "old /medical URL redirects to /room/medical");
 r = await g.req("/room/water/review");
@@ -122,6 +129,18 @@ ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merg
   ok(ROOMS.every((r) => dash.text.includes(`href="/room/${r.id}"`)) && dash.text.includes("6<!-- --> / <!-- -->6"), "map: all six rooms open, 6 / 6 passed");
   for (const r of ROOMS) { const rv = await p6.req(`/room/${r.id}/review`); if (rv.status !== 200) ok(false, "review page " + r.id); }
   ok(true, "review pages load for all six rooms");
+  ok((await p6.req("/scenario/power-outage")).status === 200, "scenario unlocks after all six rooms are passed");
+  ok((await p6.req("/api/scenarios/power-outage/complete", { method: "POST", body: { answers: [0] } })).status === 400, "scenario: malformed answers rejected");
+  const unsafeChoices = [...bestChoices]; const ui = outage.events.findIndex((ev) => ev.choices.some((c) => c.outcome === "unsafe"));
+  unsafeChoices[ui] = outage.events[ui].choices.findIndex((c) => c.outcome === "unsafe");
+  let sres = await p6.req("/api/scenarios/power-outage/complete", { method: "POST", body: { answers: unsafeChoices } });
+  ok(sres.json?.result?.passed === false && sres.json.result.criticalMisses.length === 1 && sres.json.result.score === 90, "scenario: one unsafe choice = 90 but not passed");
+  sres = await p6.req("/api/scenarios/power-outage/complete", { method: "POST", body: { answers: bestChoices } });
+  ok(sres.json?.result?.score === 100 && sres.json.result.passed && sres.json.newBadges.includes("outage_survivor"), "scenario: best choices pass and earn Outage Survivor");
+  const dash2 = await p6.req("/");
+  ok(dash2.text.includes('href="/scenario/power-outage"') && dash2.text.includes("100/100"), "dashboard shows the passed scenario");
+  const anon = await new Client().req("/api/scenarios/power-outage/complete", { method: "POST", body: { answers: bestChoices } });
+  ok(anon.status === 403, "scenario can't be submitted by a player who hasn't passed the rooms");
 }
 
 // Forgot password
