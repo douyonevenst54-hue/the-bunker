@@ -1,0 +1,524 @@
+// Content reviewed by Dr. Jhon Evenst Douyon, MD, MPH. Safety-critical: change only with review.
+import type { Room } from "./types";
+
+export const waterRoom: Room = {
+ "id": "water",
+ "n": 1,
+ "emoji": "💧",
+ "sortWeight": 0.3,
+ "next": "medical",
+ "ui": {
+  "en": {
+   "room": "Room 1 · Water Management",
+   "title": "Safe water for everyone",
+   "intro1": "A family of five is coming to your bunker. Without safe water, people can only survive a few days.",
+   "intro2": "Your mission: pick the right supplies, store them safely, figure out how much you need, then get through a hurricane.",
+   "catSort": "Choosing supplies"
+  },
+  "ht": {
+   "room": "Chanm 1 · Jesyon Dlo",
+   "title": "Dlo pwòp pou tout moun",
+   "intro1": "Yon fanmi senk moun ap vin nan bunker ou a. San dlo pwòp, moun ka viv sèlman kèk jou.",
+   "intro2": "Misyon ou: chwazi bon materyèl yo, sere yo san danje, kalkile konbyen ou bezwen, epi travèse yon siklòn.",
+   "catSort": "Chwazi materyèl"
+  }
+ },
+ "items": [
+  {
+   "e": "💧",
+   "b": "u",
+   "en": [
+    "Sealed store-bought bottled water",
+    "Unopened commercial water is the safest water to store. Keep it sealed until you need it."
+   ],
+   "ht": [
+    "Dlo nan boutèy ki sele, achte nan magazen",
+    "Dlo komèsyal ki poko louvri se dlo ki pi an sekirite pou sere. Kite l fèmen jiskaske ou bezwen l."
+   ]
+  },
+  {
+   "e": "🛢️",
+   "b": "u",
+   "en": [
+    "Food-grade 5-gallon water jugs",
+    "Containers made for drinking water won't leak chemicals into it. Look for food-grade plastic."
+   ],
+   "ht": [
+    "Galon dlo 5 galon fèt pou manje",
+    "Resipyan ki fèt pou dlo pou bwè pa lage pwodui chimik nan dlo a. Chèche plastik ki fèt pou manje."
+   ]
+  },
+  {
+   "e": "🥛",
+   "b": "a",
+   "en": [
+    "Old milk jugs",
+    "Milk proteins and sugars can't be fully washed out, so bacteria grow. The plastic also breaks down and leaks."
+   ],
+   "ht": [
+    "Vye galon lèt",
+    "Pwoteyin ak sik lèt la pa janm soti nèt, kidonk mikwòb pouse ladan. Plastik la kraze epi li koule tou."
+   ]
+  },
+  {
+   "e": "🥤",
+   "b": "u",
+   "en": [
+    "Clean 2-liter soda bottles",
+    "If you reuse bottles, FEMA says soda bottles are the right choice. Wash and sanitize them first."
+   ],
+   "ht": [
+    "Boutèy kola 2 lit ki pwòp",
+    "Si w ap reitilize boutèy, FEMA di boutèy kola se bon chwa a. Lave yo epi dezenfekte yo anvan."
+   ]
+  },
+  {
+   "e": "🪣",
+   "b": "a",
+   "en": [
+    "Bucket that held paint or chemicals",
+    "You can't clean out chemicals well enough to make the bucket safe for drinking water."
+   ],
+   "ht": [
+    "Bokit ki te gen penti oswa pwodui chimik",
+    "Ou pa ka netwaye pwodui chimik yo ase pou bokit la vin san danje pou dlo pou bwè."
+   ],
+   "critical": true
+  },
+  {
+   "e": "🧴",
+   "b": "u",
+   "en": [
+    "Plain, unscented bleach (6–8.25%)",
+    "Regular bleach makes doubtful water safe to drink. Check the label: sodium hypochlorite should be the only active ingredient."
+   ],
+   "ht": [
+    "Klowòks senp, san odè (6–8.25%)",
+    "Klowòks nòmal ka fè dlo ou pa fin sèten an bon pou bwè. Gade etikèt la: se sèlman ipoklorit sodyòm ki dwe ladan."
+   ]
+  },
+  {
+   "e": "🌸",
+   "b": "a",
+   "en": [
+    "Scented or “splashless” bleach",
+    "Scented, color-safe, or splashless bleach has added chemicals or is too weak. Never use it on drinking water."
+   ],
+   "ht": [
+    "Klowòks ki gen odè oswa “splashless”",
+    "Klowòks ki gen odè oswa ki “splashless” gen lòt pwodui chimik ladan l oswa li twò fèb. Pa janm mete l nan dlo pou bwè."
+   ],
+   "critical": true
+  },
+  {
+   "e": "💉",
+   "b": "u",
+   "en": [
+    "Eyedropper",
+    "You measure bleach in drops. A dropper keeps the dose accurate."
+   ],
+   "ht": [
+    "Konngout",
+    "Klowòks la mezire an gout. Yon konngout ede w mete bon kantite a."
+   ]
+  },
+  {
+   "e": "🍲",
+   "b": "u",
+   "en": [
+    "Pot and a safe way to heat it",
+    "Boiling is the surest way to kill germs. Never run a gas stove or grill inside a closed space."
+   ],
+   "ht": [
+    "Chodyè ak yon fason san danje pou chofe l",
+    "Bouyi dlo se fason ki pi sèten pou touye mikwòb. Pa janm sèvi ak recho gaz oswa griy anndan yon kote ki fèmen."
+   ]
+  },
+  {
+   "e": "🧻",
+   "b": "u",
+   "en": [
+    "Clean cloths or coffee filters",
+    "Cloudy water must be filtered or settled first. Germ killers work poorly on dirty water."
+   ],
+   "ht": [
+    "Twal pwòp oswa filt kafe",
+    "Fòk ou filtre dlo ki twoub la oswa kite l repoze anvan. Bagay ki touye mikwòb yo pa mache byen nan dlo sal."
+   ]
+  },
+  {
+   "e": "⛲",
+   "b": "s",
+   "en": [
+    "Decorative water fountain",
+    "Nice to look at, but it wastes space and water. Every gallon counts."
+   ],
+   "ht": [
+    "Ti fontèn dekorasyon",
+    "Li bèl, men li pran plas epi li gaspiye dlo. Chak galon konte."
+   ]
+  },
+  {
+   "e": "🎈",
+   "b": "s",
+   "en": [
+    "Water balloons",
+    "Fun, but no use for survival. Save the space and water."
+   ],
+   "ht": [
+    "Blad dlo pou jwe",
+    "Li amizan, men li pa itil pou siviv. Sere plas la ak dlo a."
+   ]
+  }
+ ],
+ "stages": [
+  {
+   "key": "store",
+   "w": 0.2,
+   "label": {
+    "en": "Stage 2 · Store",
+    "ht": "Etap 2 · Sere"
+   },
+   "cat": {
+    "en": "Safe storage",
+    "ht": "Sere san danje"
+   },
+   "qs": [
+    {
+     "en": {
+      "q": "Where should you store the water containers?",
+      "o": [
+       "In a cool, dark place, off bare concrete, away from chemicals",
+       "Next to the gasoline and paint cans",
+       "By the sunny window so you can see the levels",
+       "On top of the generator to save space"
+      ],
+      "x": "Heat, light and nearby chemicals all spoil stored water. Pick a cool, dark spot away from fuel and toxic products."
+     },
+     "ht": {
+      "q": "Ki kote ou dwe sere resipyan dlo yo?",
+      "o": [
+       "Nan yon kote ki fre, ki fè nwa, pa atè sou beton, lwen pwodui chimik",
+       "Bò kote galon gazolin ak penti yo",
+       "Bò fenèt la nan solèy pou w ka wè nivo a",
+       "Sou tèt jeneratè a pou ekonomize plas"
+      ],
+      "x": "Chalè, limyè ak pwodui chimik ki toupre gate dlo ou sere a. Chwazi yon kote ki fre, ki fè nwa, lwen gaz ak pwodui toksik."
+     },
+     "a": 0
+    },
+    {
+     "en": {
+      "q": "You filled your own containers with tap water. How often should you replace it?",
+      "o": [
+       "Never, water doesn't expire",
+       "Every 6 months",
+       "Every 5 years",
+       "Only if it smells bad"
+      ],
+      "x": "Ready.gov recommends replacing water you stored yourself every six months. Store-bought water: follow the date on the bottle."
+     },
+     "ht": {
+      "q": "Ou ranpli resipyan ou yo ak dlo tiyo. Chak konbyen tan ou dwe chanje l?",
+      "o": [
+       "Pa janm, dlo pa ekspire",
+       "Chak 6 mwa",
+       "Chak 5 an",
+       "Sèlman si li gen move odè"
+      ],
+      "x": "Ready.gov rekòmande pou chanje dlo ou sere tèt ou chak sis mwa. Dlo ki soti nan magazen: swiv dat ki sou boutèy la."
+     },
+     "a": 1
+    },
+    {
+     "en": {
+      "q": "What should you write on each container?",
+      "o": [
+       "Nothing",
+       "Your name",
+       "“DRINKING WATER” and the date you filled it",
+       "The brand of the container"
+      ],
+      "x": "A label stops mix-ups and tells you when it's time to rotate the water."
+     },
+     "ht": {
+      "q": "Kisa ou dwe ekri sou chak resipyan?",
+      "o": [
+       "Anyen",
+       "Non ou",
+       "“DLO POU BWÈ” ak dat ou te ranpli l",
+       "Mak resipyan an"
+      ],
+      "x": "Yon etikèt anpeche konfizyon epi li di w ki lè pou chanje dlo a."
+     },
+     "a": 2
+    }
+   ]
+  },
+  {
+   "key": "calc",
+   "w": 0.2,
+   "label": {
+    "en": "Stage 3 · Calculate",
+    "ht": "Etap 3 · Kalkile"
+   },
+   "cat": {
+    "en": "Planning amounts",
+    "ht": "Planifye kantite"
+   },
+   "qs": [
+    {
+     "en": {
+      "q": "Minimum water: 1 gallon per person per day. How much does a family of 5 need for 30 days?",
+      "o": [
+       "30 gallons",
+       "75 gallons",
+       "150 gallons",
+       "300 gallons"
+      ],
+      "x": "5 people × 1 gallon × 30 days = 150 gallons. About half is for drinking, the rest for cooking and hygiene."
+     },
+     "ht": {
+      "q": "Minimòm dlo: 1 galon pa moun pa jou. Konbyen yon fanmi 5 moun bezwen pou 30 jou?",
+      "o": [
+       "30 galon",
+       "75 galon",
+       "150 galon",
+       "300 galon"
+      ],
+      "x": "5 moun × 1 galon × 30 jou = 150 galon. Apeprè mwatye se pou bwè, rès la pou kwit manje ak pou lijyèn."
+     },
+     "a": 2
+    },
+    {
+     "en": {
+      "q": "Grandma is sick, a mother is breastfeeding, and it's very hot. What changes?",
+      "o": [
+       "Nothing, 1 gallon is always enough",
+       "Plan for MORE water",
+       "Give them less so the kids get more"
+      ],
+      "x": "Children, nursing mothers, sick people and hot weather all raise water needs. 1 gallon is the floor, not the ceiling."
+     },
+     "ht": {
+      "q": "Grann malad, yon manman ap bay tete, epi fè cho anpil. Kisa ki chanje?",
+      "o": [
+       "Anyen, 1 galon toujou ase",
+       "Planifye PLIS dlo",
+       "Ba yo mwens pou timoun yo ka jwenn plis"
+      ],
+      "x": "Timoun, manman k ap bay tete, moun malad ak gwo chalè fè moun bezwen plis dlo. 1 galon se minimòm nan, se pa maksimòm nan."
+     },
+     "a": 1
+    },
+    {
+     "en": {
+      "q": "You can't afford 30 days of water right now. Where should a real family start?",
+      "o": [
+       "Don't bother unless you can do 30 days",
+       "At least 3 days, then build toward 2 weeks or more",
+       "One bottle per person"
+      ],
+      "x": "Ready.gov: keep at least a several-day supply, and aim for two weeks. Start small and build up."
+     },
+     "ht": {
+      "q": "Ou pa gen mwayen pou achte dlo pou 30 jou kounye a. Ki kote yon fanmi dwe kòmanse?",
+      "o": [
+       "Pa fatige w si ou pa ka fè 30 jou",
+       "Omwen 3 jou, epi ogmante l pou rive 2 semèn oswa plis",
+       "Yon boutèy pa moun"
+      ],
+      "x": "Ready.gov: kenbe dlo pou omwen kèk jou, epi vize de semèn. Kòmanse piti epi ogmante."
+     },
+     "a": 1
+    }
+   ]
+  },
+  {
+   "key": "emerg",
+   "w": 0.3,
+   "label": {
+    "en": "Stage 4 · Emergency",
+    "ht": "Etap 4 · Ijans"
+   },
+   "cat": {
+    "en": "Emergency response",
+    "ht": "Reyaksyon nan ijans"
+   },
+   "scene": {
+    "en": "🌀 Hurricane",
+    "ht": "🌀 Siklòn"
+   },
+   "qs": [
+    {
+     "en": {
+      "q": "Hurricane passed. Your stored water is low and the tap water comes out brown and cloudy. Officials issued a boil-water notice. What do you do FIRST?",
+      "o": [
+       "Drink it quickly before it gets worse",
+       "Let it settle, then filter it through a clean cloth",
+       "Add bleach right away without filtering",
+       "Wait until it looks clear, then drink it"
+      ],
+      "x": "Germ killers don't work well in cloudy water. Let it settle and filter it before you treat it. Clear-looking water can still carry germs."
+     },
+     "ht": {
+      "q": "Siklòn nan pase. Dlo ou te sere a prèske fini, epi dlo tiyo a soti mawon e twoub. Otorite yo bay yon avi pou bouyi dlo. Kisa ou fè AN PREMYE?",
+      "o": [
+       "Bwè l vit anvan li vin pi mal",
+       "Kite l repoze, epi filtre l nan yon twal pwòp",
+       "Mete klowòks touswit san filtre",
+       "Tann li sanble klè epi bwè l"
+      ],
+      "x": "Bagay ki touye mikwòb yo pa mache byen nan dlo twoub. Kite l repoze epi filtre l anvan ou trete l. Dlo ki sanble klè ka gen mikwòb toujou."
+     },
+     "a": 1,
+     "critical": true
+    },
+    {
+     "en": {
+      "q": "You can boil it. How long?",
+      "o": [
+       "Until the first bubbles appear",
+       "A rolling boil for at least 1 minute",
+       "10 seconds",
+       "Just warm it up"
+      ],
+      "x": "Bring it to a full rolling boil for 1 minute (3 minutes at high altitude). Let it cool before drinking."
+     },
+     "ht": {
+      "q": "Ou ka bouyi l. Pandan konbyen tan?",
+      "o": [
+       "Jiskaske premye ti boul yo parèt",
+       "Bon bouyon pandan omwen 1 minit",
+       "10 segonn",
+       "Annik chofe l"
+      ],
+      "x": "Fè l bouyi byen fò pandan 1 minit (3 minit si w nan mòn byen wo). Kite l refwadi anvan ou bwè l."
+     },
+     "a": 1
+    },
+    {
+     "en": {
+      "q": "No fuel left to boil. You have 6% bleach. The water was cloudy but is now filtered. How many drops per gallon?",
+      "o": [
+       "2 drops",
+       "8 drops",
+       "16 drops",
+       "A full cup"
+      ],
+      "x": "EPA: 8 drops of 6% bleach per gallon of clear water. Double it, to 16 drops, if the water is still cloudy, colored, or very cold."
+     },
+     "ht": {
+      "q": "Pa gen gaz ankò pou bouyi. Ou gen klowòks 6%. Dlo a te twoub men ou filtre l kounye a. Konbyen gout pa galon?",
+      "o": [
+       "2 gout",
+       "8 gout",
+       "16 gout",
+       "Yon tas plen"
+      ],
+      "x": "EPA: 8 gout klowòks 6% pou chak galon dlo klè. Double l, 16 gout, si dlo a toujou twoub, gen koulè, oswa li frèt anpil."
+     },
+     "a": 2
+    },
+    {
+     "en": {
+      "q": "After adding bleach, how long before anyone drinks it?",
+      "o": [
+       "Drink immediately",
+       "Stir and wait 30 minutes",
+       "Wait 3 days"
+      ],
+      "x": "Stir and wait 30 minutes. It should smell slightly of chlorine. If not, add the dose again and wait 15 more minutes."
+     },
+     "ht": {
+      "q": "Apre ou fin mete klowòks la, konbyen tan pou tann anvan moun bwè l?",
+      "o": [
+       "Bwè l touswit",
+       "Brase l epi tann 30 minit",
+       "Tann 3 jou"
+      ],
+      "x": "Brase l epi tann 30 minit. Li dwe gen yon ti sant klowòks. Si li pa genyen, mete menm dòz la ankò epi tann 15 minit anplis."
+     },
+     "a": 1
+    },
+    {
+     "en": {
+      "q": "Flood water got into the tank and it smells like gasoline. Boil or bleach it?",
+      "o": [
+       "Boil it longer",
+       "Double the bleach",
+       "Neither. Don't drink it. Use stored water and call your local health department."
+      ],
+      "x": "Boiling and bleach kill germs but do NOT remove fuel, metals or other chemicals. This is when you get outside help."
+     },
+     "ht": {
+      "q": "Dlo inondasyon antre nan rezèvwa a epi li santi gazolin. Bouyi l oswa mete klowòks?",
+      "o": [
+       "Bouyi l pi lontan",
+       "Double klowòks la",
+       "Ni youn ni lòt. Pa bwè l. Sèvi ak dlo ou sere a epi rele depatman sante lokal la."
+      ],
+      "x": "Bouyi ak klowòks touye mikwòb, men yo PA retire gaz, metal oswa lòt pwodui chimik. Se lè sa a pou chèche èd deyò."
+     },
+     "a": 2,
+     "critical": true
+    },
+    {
+     "en": {
+      "q": "Day 20. Water is running low. What's the safe move?",
+      "o": [
+       "Cut everyone to one cup a day",
+       "Drink what you need today, and look for safe water and outside help now",
+       "Give it all to the adults"
+      ],
+      "x": "FEMA: never ration water. Drink what you need today, and start finding more safe water or help, including evacuation if officials call for it."
+     },
+     "ht": {
+      "q": "Jou 20. Dlo a prèske fini. Kisa ki pi an sekirite?",
+      "o": [
+       "Bay chak moun yon tas pa jou sèlman",
+       "Bwè sa ou bezwen jodi a, epi chèche dlo pwòp ak èd deyò kounye a",
+       "Bay granmoun yo tout dlo a"
+      ],
+      "x": "FEMA: pa janm rasyone dlo. Bwè sa ou bezwen jodi a, epi kòmanse chèche plis dlo pwòp oswa èd, menm evakye si otorite yo mande l."
+     },
+     "a": 1
+    }
+   ]
+  }
+ ],
+ "check": {
+  "en": [
+   "Store 1 gallon per person per day: at least 3 days to start, 2 weeks or more as your goal",
+   "Use sealed bottled water or food-grade containers. No milk jugs, no chemical buckets",
+   "Label each container “DRINKING WATER” with the date",
+   "Replace water you bottled yourself every 6 months",
+   "Keep water in a cool, dark place away from fuel and chemicals",
+   "Plain unscented bleach (6–8.25%) and an eyedropper",
+   "Clean cloths or coffee filters for cloudy water",
+   "A pot and a SAFE way to boil water (never a grill indoors)",
+   "Remember: boiling and bleach don't remove chemicals. Follow local health officials."
+  ],
+  "ht": [
+   "Sere 1 galon pa moun pa jou: omwen 3 jou pou kòmanse, 2 semèn oswa plis kòm objektif",
+   "Sèvi ak dlo nan boutèy ki sele oswa resipyan ki fèt pou manje. Pa galon lèt, pa bokit pwodui chimik",
+   "Ekri “DLO POU BWÈ” ak dat la sou chak resipyan",
+   "Chanje dlo ou te mete nan boutèy tèt ou chak 6 mwa",
+   "Sere dlo a nan yon kote ki fre, ki fè nwa, lwen gaz ak pwodui chimik",
+   "Klowòks senp san odè (6–8.25%) ak yon konngout",
+   "Twal pwòp oswa filt kafe pou dlo twoub",
+   "Yon chodyè ak yon fason SAN DANJE pou bouyi dlo (pa janm griy anndan kay)",
+   "Sonje: bouyi ak klowòks pa retire pwodui chimik. Swiv sa otorite sante lokal yo di."
+  ]
+ },
+ "sources": [
+  [
+   "EPA · Emergency Disinfection of Drinking Water",
+   "https://www.epa.gov/ground-water-and-drinking-water/emergency-disinfection-drinking-water"
+  ],
+  [
+   "Ready.gov (FEMA) · Water",
+   "https://www.ready.gov/water"
+  ]
+ ]
+};

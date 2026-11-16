@@ -1,0 +1,53 @@
+// THE BUNKER — database schema.
+// Change it with `npm run migrate:dev` (prisma migrate dev). Never use `prisma db push`.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// A guest (no email) or registered player.
+model Player {
+  id           String         @id @default(cuid())
+  email        String?        @unique
+  passwordHash String?
+  displayName  String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  attempts     RoomAttempt[]
+  progress     RoomProgress[]
+}
+
+/// Every finished playthrough of a room, scored on the server.
+model RoomAttempt {
+  id             String   @id @default(cuid())
+  playerId       String
+  player         Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  roomId         String
+  score          Int
+  passed         Boolean
+  criticalErrors Int
+  breakdown      Json
+  answers        Json
+  createdAt      DateTime @default(now())
+
+  @@index([playerId, roomId])
+}
+
+/// Best result per player per room. Drives unlocking.
+model RoomProgress {
+  playerId     String
+  player       Player    @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  roomId       String
+  bestScore    Int
+  passed       Boolean
+  attempts     Int
+  lastPlayedAt DateTime
+  passedAt     DateTime?
+
+  @@id([playerId, roomId])
+}
