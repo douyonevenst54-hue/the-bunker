@@ -18,4 +18,4 @@ trap 'kill $SERVER 2>/dev/null || true' EXIT
 for i in $(seq 1 60); do curl -sf http://localhost:3000/ >/dev/null && break; sleep 1; done
 
 STRIPE_WEBHOOK_SECRET=whsec_test_bunker node tests/e2e.mjs
-if [ "${UI_TESTS:-0}" = "1" ]; then node tests/ui-place.mjs && node tests/ui-scenario.mjs; fi
+if [ "${UI_TESTS:-0}" = "1" ]; then node tests/ui-place.mjs && node tests/ui-scenario.mjs && node tests/ui-3d.mjs; fi

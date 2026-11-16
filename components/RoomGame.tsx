@@ -1,16 +1,15 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { stageLength, type Bin, type Room, type RoomAnswers } from "@/lib/rooms/types";
 import PlaceBoard from "./PlaceBoard";
 import { optionOrder } from "@/lib/shuffle";
+import Link from "next/link";
+import { ROOMS_3D } from "@/lib/rooms/three-d";
 import { scoreRoom, type RoomResult } from "@/lib/scoring";
 import { useLang } from "./LangProvider";
-import { BADGES } from "@/lib/badges";
-import type { StringKey } from "@/lib/i18n";
+import RoomResults, { type Save } from "./RoomResults";
 
 type Screen = { kind: "intro" } | { kind: "sort"; i: number } | { kind: "stage"; s: number; i: number } | { kind: "results" };
-type Save = "saving" | "saved" | "failed";
 
 export default function RoomGame({ room, reviewed }: { room: Room; reviewed?: { name: string; date: string } | null }) {
   const { lang, t } = useLang();
@@ -19,7 +18,6 @@ export default function RoomGame({ room, reviewed }: { room: Room; reviewed?: { 
   const ans = useRef<RoomAnswers>({ sort: [], stages: {} });
   const [result, setResult] = useState<RoomResult | null>(null);
   const [save, setSave] = useState<Save>("saving");
-  const [copied, setCopied] = useState(false);
   const [newBadges, setNewBadges] = useState<string[]>([]);
   const ui = room.ui[lang];
 
@@ -30,7 +28,7 @@ export default function RoomGame({ room, reviewed }: { room: Room; reviewed?: { 
 
   function restart() {
     ans.current = { sort: [], stages: {} };
-    setResult(null); setNewBadges([]); setPicked(null); setCopied(false); setScreen({ kind: "intro" });
+    setResult(null); setNewBadges([]); setPicked(null); setScreen({ kind: "intro" });
   }
 
   async function finish() {
@@ -89,7 +87,8 @@ export default function RoomGame({ room, reviewed }: { room: Room; reviewed?: { 
         <div className="stage">{ui.room}</div>
         <div className="hero">{room.emoji}</div>
         <h1>{ui.title}</h1><p>{ui.intro1}</p><p>{ui.intro2}</p>
-        <button className="btn" onClick={() => setScreen({ kind: "sort", i: 0 })}>{t("start")}</button>
+        {ROOMS_3D.includes(room.id) && <Link className="btn b3-cta" href={`/room/${room.id}/3d`}>{t("play3d")}</Link>}
+        <button className={`btn ${ROOMS_3D.includes(room.id) ? "ghost" : ""}`} onClick={() => setScreen({ kind: "sort", i: 0 })}>{t("start")}</button>
         {reviewed && <p className="reviewed">✅ {t("reviewedBy")} {reviewed.name} · {reviewed.date}</p>}
       </div>
       <p className="note" dangerouslySetInnerHTML={{ __html: t("proto") }} />
@@ -161,71 +160,5 @@ export default function RoomGame({ room, reviewed }: { room: Room; reviewed?: { 
     );
   }
 
-  // results
-  const r = result!;
-  const col = (v: number) => (v >= 80 ? "var(--good)" : v >= 60 ? "var(--mid)" : "var(--bad)");
-  const scoreCol = r.criticalMisses.length ? "var(--bad)" : col(r.score);
-  const catName = (key: string) => key === "sort" ? ui.catSort : room.stages.find((s) => s.key === key)!.cat[lang];
-  const missedText = r.criticalMisses.map((en) => {
-    const it = room.items.find((x) => x.en[0] === en);
-    if (it) return it[lang][0];
-    for (const S of room.stages) {
-      if (S.kind === "place") { const p = S.items.find((x) => x.name.en === en); if (p) return `${p.e} ${p.name[lang]}`; }
-      else { const q = S.qs.find((x) => x.en.q === en); if (q) return q[lang].q; }
-    }
-    return en;
-  });
-  return (
-    <>{progress}
-      <div className="card">
-        <div className="stage">{t("results")}</div>
-        <div className="score">
-          <div className="big" style={{ color: scoreCol }}>{r.score}<small>/100</small></div>
-          <span className="badge" style={{ background: scoreCol, color: "#111" }}>{r.level === "expert" ? "🏅 " : ""}{t(`level_${r.level}` as StringKey)}</span>
-        </div>
-        {r.criticalMisses.length > 0 && (
-          <div className="critical">
-            <strong>⚠️ {t("criticalTitle")}</strong>
-            <p>{t("criticalBody")}</p>
-            <ul>{missedText.map((m, i) => <li key={i}>{m}</li>)}</ul>
-          </div>
-        )}
-        {r.categories.map((c) => {
-          const v = Math.round((c.correct / c.total) * 100);
-          return (
-            <div className="bar" key={c.key}>
-              <div className="row"><span>{catName(c.key)}</span><span>{c.correct}/{c.total}</span></div>
-              <div className="track"><div className="fill" style={{ width: `${v}%`, background: col(v) }} /></div>
-            </div>
-          );
-        })}
-        {newBadges.length > 0 && (
-          <div className="new-badges">
-            <strong>{t("newBadges")}</strong>
-            {BADGES.filter((b) => newBadges.includes(b.id)).map((b) => (
-              <div key={b.id} className="nb"><span>{b.emoji}</span>{b.name[lang]}</div>
-            ))}
-          </div>
-        )}
-        <div className="status">{save === "saving" ? t("saving") : save === "saved" ? t("saved") : t("notSaved")}</div>
-        {r.passed && room.next
-          ? <Link className="btn" href={`/room/${room.next}`}>{t("nextRoom")} →</Link>
-          : !r.passed && <p className="status">{t("unlockHint")}</p>}
-        <button className={`btn ${r.passed && room.next ? "ghost" : ""}`} onClick={restart}>{t("again")}</button>
-        <Link className="btn ghost" href="/">{t("backToBunker")}</Link>
-      </div>
-
-      <div className="card" style={{ marginTop: 14 }}>
-        <h2>📋 {t("checklist")}</h2><p>{t("checkSub")}</p>
-        <ul className="check">{room.check[lang].map((x, i) => <li key={i}>{x}</li>)}</ul>
-        <button className="btn ghost" onClick={async () => {
-          try { await navigator.clipboard.writeText(`THE BUNKER — ${t("checklist")}\n` + room.check[lang].map((x) => "☐ " + x).join("\n")); setCopied(true); } catch {}
-        }}>{copied ? t("copied") : t("copy")}</button>
-        <div className="src">{t("sources")}<br />
-          {room.sources.map(([n, u]) => <span key={u}><a href={u} target="_blank" rel="noopener">{n}</a><br /></span>)}
-        </div>
-      </div>
-      <p className="note" dangerouslySetInnerHTML={{ __html: t("proto") }} />
-    </>
-  );
+  return <RoomResults room={room} result={result!} save={save} newBadges={newBadges} onRestart={restart} progress={progress} />;
 }

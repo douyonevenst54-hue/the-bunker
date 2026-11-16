@@ -23,6 +23,8 @@ Next.js (App Router) · TypeScript · Prisma · Neon PostgreSQL · Vercel
 - [x] Level 3: Flood (watch, flash flood, return home, food, wells, mold, wiring)
 - [ ] Level 4: Conflict / civil unrest · Level 5: Nuclear emergency (plus earthquake)
 - [x] Free / subscription split: Rooms 1–2 free; members ($2.99/mo or $24.99/yr via Stripe) get rooms 3–6 and every level
+- [x] 3D Water room (beta): first-person, tap-to-move; same content and scoring; 2D stays as Lite mode
+- [ ] 3D for rooms 2–6
 - [ ] School / organization licenses
 
 ## Develop
