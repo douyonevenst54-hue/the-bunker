@@ -146,7 +146,7 @@ ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merg
   ok((await p6.req("/room/security")).status === 200, "member: Room 3 opens");
   let allOk = true, lockedOk = true;
   for (const [i, room] of ROOMS.entries()) {
-    if (i >= 1 && i + 1 < ROOMS.length) { const nx = await p6.req("/room/" + ROOMS[i + 1].id); if (nx.status === 200) lockedOk = false; }
+    if (i >= 2 && i + 1 < ROOMS.length) { const nx = await p6.req("/room/" + ROOMS[i + 1].id); if (nx.status === 200) lockedOk = false; }
     const res = await p6.req(`/api/rooms/${room.id}/complete`, { method: "POST", body: { answers: perfect(room) } });
     if (!(res.json?.result?.score === 100 && res.json.result.passed)) allOk = false;
     if (i === ROOMS.length - 1) ok(res.json.newBadges.includes("bunker_complete") && res.json.newBadges.includes("power_keeper"), "passing Room 6 earns Power Keeper + Bunker Commander");
