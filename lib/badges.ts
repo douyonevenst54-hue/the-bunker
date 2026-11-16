@@ -38,6 +38,30 @@ export const BADGES: Badge[] = [
     earned: passedRoom("medical"),
   },
   {
+    id: "fire_ready", emoji: "🚒",
+    name: { en: "Fire Ready", ht: "Pare pou Dife" },
+    desc: { en: "Pass the Security room", ht: "Reyisi chanm Sekirite a" },
+    earned: passedRoom("security"),
+  },
+  {
+    id: "food_keeper", emoji: "🥫",
+    name: { en: "Food Keeper", ht: "Gadyen Manje" },
+    desc: { en: "Pass the Food room", ht: "Reyisi chanm Manje a" },
+    earned: passedRoom("food"),
+  },
+  {
+    id: "clean_air", emoji: "🌬️",
+    name: { en: "Clean Air", ht: "Lè Pwòp" },
+    desc: { en: "Pass the Air room", ht: "Reyisi chanm Lè a" },
+    earned: passedRoom("air"),
+  },
+  {
+    id: "power_keeper", emoji: "🔋",
+    name: { en: "Power Keeper", ht: "Gadyen Kouran" },
+    desc: { en: "Pass the Energy room", ht: "Reyisi chanm Enèji a" },
+    earned: passedRoom("energy"),
+  },
+  {
     id: "first_try", emoji: "🎯",
     name: { en: "Ready on Day One", ht: "Pare Depi Premye Jou" },
     desc: { en: "Pass a room on your first try", ht: "Reyisi yon chanm depi premye fwa" },

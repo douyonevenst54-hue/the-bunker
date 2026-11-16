@@ -700,5 +700,6 @@ export const medicalRoom: Room = {
    "NC DHHS (CDC guidance) · Wounds and Tetanus After a Storm",
    "https://ncdhhs.gov/after-storm-wounds-and-tetanus"
   ]
- ]
+ ],
+ "next": "security"
 };

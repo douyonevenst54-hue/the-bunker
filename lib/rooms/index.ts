@@ -1,21 +1,20 @@
 import type { Room, Tx } from "./types";
 import { waterRoom } from "./water";
 import { medicalRoom } from "./medical";
+import { securityRoom } from "./security";
+import { foodRoom } from "./food";
+import { airRoom } from "./air";
+import { energyRoom } from "./energy";
 
 /** Playable rooms, in unlock order. */
-export const ROOMS: Room[] = [waterRoom, medicalRoom];
+export const ROOMS: Room[] = [waterRoom, medicalRoom, securityRoom, foodRoom, airRoom, energyRoom];
 
 export function getRoom(id: string): Room | undefined {
   return ROOMS.find((r) => r.id === id);
 }
 
 /** Rooms planned for the six-room MVP that are not built yet. */
-export const COMING_SOON: { id: string; emoji: string; name: Tx }[] = [
-  { id: "security", emoji: "🚪", name: { en: "Security & Entrance", ht: "Sekirite ak Antre" } },
-  { id: "food", emoji: "🥫", name: { en: "Food & Nutrition", ht: "Manje ak Nitrisyon" } },
-  { id: "air", emoji: "🌬️", name: { en: "Air & Ventilation", ht: "Lè ak Vantilasyon" } },
-  { id: "energy", emoji: "🔋", name: { en: "Energy & Electricity", ht: "Enèji ak Elektrisite" } },
-];
+export const COMING_SOON: { id: string; emoji: string; name: Tx }[] = [];
 
 /**
  * Bunker floor plan: a central corridor with three rooms on each side.
