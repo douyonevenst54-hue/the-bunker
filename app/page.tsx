@@ -6,6 +6,7 @@ import { getPlayer } from "@/lib/session";
 import { getRoomStatuses, getBadgeIds, getLevels } from "@/lib/progress";
 import { SCENARIOS } from "@/lib/scenarios";
 import BunkerMap from "@/components/BunkerMap";
+import { needsPlan, paywallOn, isMember } from "@/lib/plan";
 import BadgeShelf from "@/components/BadgeShelf";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +22,9 @@ export default async function Bunker() {
   ]);
   const total = ROOMS.length + COMING_SOON.length;
   const passed = statuses.filter((r) => r.passed).length;
-  const nextUp = statuses.find((r) => r.unlocked && !r.passed);
+  const premium = ROOMS.map((r) => r.id).filter((id) => needsPlan(id, player));
+  const showUpgrade = paywallOn() && !isMember(player);
+  const nextUp = statuses.find((r) => r.unlocked && !r.passed && !premium.includes(r.id));
   const nextRoom = nextUp && ROOMS.find((r) => r.id === nextUp.id);
 
   return (
@@ -36,13 +39,14 @@ export default async function Bunker() {
       </div>
 
       <div className="card map-card">
-        <BunkerMap lang={lang} statuses={statuses} />
+        <BunkerMap lang={lang} statuses={statuses} premium={premium} />
         <div className="legend">
           <span><i className="lg passed" />{s.statusPassed}</span>
           <span><i className="lg open" />{s.play_}</span>
           <span><i className="lg locked" />{s.locked}</span>
           <span><i className="lg soon" />{s.comingSoon}</span>
         </div>
+        {showUpgrade && <Link className="btn" href="/upgrade">💎 {s.upgrade}</Link>}
       </div>
 
       <div className="stage" style={{ marginTop: 18 }}>{s.levels}</div>
@@ -56,6 +60,15 @@ export default async function Bunker() {
               <div className="ic">🔒</div>
               <div className="mid"><div className="t">{name}</div><div className="s">{why}</div></div>
             </div>
+          );
+        }
+        if (needsPlan(lv.id, player)) {
+          return (
+            <Link key={lv.id} className="room scenario premium" href="/upgrade" style={{ marginTop: 10 }}>
+              <div className="ic">{sc.emoji}</div>
+              <div className="mid"><div className="t">{name}</div><div className="s">💎 {s.membersOnly}</div></div>
+              <div className="go">{s.upgrade}</div>
+            </Link>
           );
         }
         return (

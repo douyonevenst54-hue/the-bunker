@@ -4,6 +4,7 @@ import { getScenario, scoreScenario, validateScenarioAnswers } from "@/lib/scena
 import { prisma, dbEnabled } from "@/lib/db";
 import { getPlayer } from "@/lib/session";
 import { getBadgeIds, getLevels } from "@/lib/progress";
+import { needsPlan } from "@/lib/plan";
 
 /** Scenario results are scored on the server and stored like room attempts (roomId = scenario id). */
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -17,6 +18,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   if (!player || !level?.unlocked) {
     return NextResponse.json({ error: "This level is locked" }, { status: 403 });
   }
+  if (needsPlan(sc.id, player)) return NextResponse.json({ error: "membersOnly" }, { status: 402 });
 
   let answers: number[];
   try {

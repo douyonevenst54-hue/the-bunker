@@ -1,6 +1,7 @@
 // End-to-end test against a running server with a real database.
 // Usage: BASE=http://localhost:3000 DATABASE_URL=... node tests/e2e.mjs
 import { execSync } from "node:child_process";
+import { createHmac } from "node:crypto";
 
 const BASE = process.env.BASE || "http://localhost:3000";
 let failures = 0;
@@ -43,6 +44,14 @@ const withCriticalMiss = (room) => {
   const a = perfect(room); const S = room.stages.find((s) => s.qs?.some((q) => q.critical));
   const i = S.qs.findIndex((q) => q.critical); a.stages[S.key][i] = (S.qs[i].a + 1) % S.qs[i].en.o.length; return a;
 };
+/** Sends a Stripe-signed webhook event (same scheme Stripe uses: t=..,v1=HMAC-SHA256). */
+const stripeEvent = async (type, object, secret = process.env.STRIPE_WEBHOOK_SECRET) => {
+  const payload = JSON.stringify({ id: "evt_test_" + Math.random().toString(36).slice(2), object: "event", type, data: { object } });
+  const t = Math.floor(Date.now() / 1000);
+  const sig = createHmac("sha256", secret).update(`${t}.${payload}`).digest("hex");
+  const res = await fetch(BASE + "/api/billing/webhook", { method: "POST", headers: { "Content-Type": "application/json", "Stripe-Signature": `t=${t},v1=${sig}` }, body: payload });
+  return res.status;
+};
 const sql = (q) => execSync(`psql "${process.env.DATABASE_URL}" -tAc "${q}"`).toString().trim();
 
 const g = new Client();
@@ -54,7 +63,7 @@ ok(r.status === 307 || r.status === 303 || r.status === 302, "Room 2 is locked f
 r = await g.req("/scenario/power-outage");
 ok(r.status !== 200, "scenario is locked for a new visitor");
 r = await g.req("/scenario/power-outage/review");
-ok(r.status === 200 && r.text.includes("⚠️"), "scenario review page loads with critical markers");
+ok(r.status !== 200 && r.location?.includes("/upgrade"), "members-only review page sends visitors to /upgrade");
 r = await g.req("/medical");
 ok(r.status === 308 && r.location?.endsWith("/room/medical"), "old /medical URL redirects to /room/medical");
 r = await g.req("/room/water/review");
@@ -118,9 +127,26 @@ ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merg
 // Full bunker: six rooms in order
 {
   const p6 = new Client();
+  // Paywall: a free account can play rooms 1–2 only
+  await p6.req("/api/auth/register", { method: "POST", body: { email: "member@example.com", password: "longenough1" } });
+  for (const room of ROOMS.slice(0, 2)) await p6.req(`/api/rooms/${room.id}/complete`, { method: "POST", body: { answers: perfect(room) } });
+  r = await p6.req("/room/security");
+  ok(r.status !== 200 && r.location?.includes("/upgrade"), "paywall: Room 3 sends a free account to /upgrade");
+  ok((await p6.req("/api/rooms/security/complete", { method: "POST", body: { answers: perfect(ROOMS[2]) } })).status === 402, "paywall: Room 3 results can't be saved without membership");
+  r = await p6.req("/");
+  ok(r.text.includes('href="/upgrade"') && r.text.includes("Members only"), "dashboard shows members-only rooms and the upgrade button");
+  r = await p6.req("/upgrade");
+  ok(r.status === 200 && r.text.includes("Unlock the whole bunker"), "upgrade page loads");
+  ok((await p6.req("/api/billing/checkout", { method: "POST", body: { interval: "month" } })).status === 503, "checkout waits until Stripe is configured");
+  ok((await new Client().req("/api/billing/checkout", { method: "POST", body: {} })).status === 401, "checkout needs an account");
+  const p6id = sql("select id from \\\"Player\\\" where email='member@example.com'");
+  ok(await stripeEvent("checkout.session.completed", { id: "cs_1", object: "checkout.session", mode: "subscription", status: "complete", client_reference_id: p6id, customer: "cus_member" }, "whsec_wrong") === 400, "webhook: bad signature rejected");
+  ok(await stripeEvent("checkout.session.completed", { id: "cs_1", object: "checkout.session", mode: "subscription", status: "complete", client_reference_id: p6id, customer: "cus_member" }) === 200, "webhook: signed checkout event accepted");
+  ok(sql(`select \\\"subStatus\\\"||','||\\\"stripeCustomerId\\\" from \\\"Player\\\" where id='${p6id}'`) === "active,cus_member", "checkout makes the account a member");
+  ok((await p6.req("/room/security")).status === 200, "member: Room 3 opens");
   let allOk = true, lockedOk = true;
   for (const [i, room] of ROOMS.entries()) {
-    if (i + 1 < ROOMS.length) { const nx = await p6.req("/room/" + ROOMS[i + 1].id); if (nx.status === 200) lockedOk = false; }
+    if (i >= 2 && i + 1 < ROOMS.length) { const nx = await p6.req("/room/" + ROOMS[i + 1].id); if (nx.status === 200) lockedOk = false; }
     const res = await p6.req(`/api/rooms/${room.id}/complete`, { method: "POST", body: { answers: perfect(room) } });
     if (!(res.json?.result?.score === 100 && res.json.result.passed)) allOk = false;
     if (i === ROOMS.length - 1) ok(res.json.newBadges.includes("bunker_complete") && res.json.newBadges.includes("power_keeper"), "passing Room 6 earns Power Keeper + Bunker Commander");
@@ -166,6 +192,13 @@ ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merg
   ok(fl.json?.result?.passed === false && fl.json.result.criticalMisses.length === 1, "flood: an unsafe choice blocks passing");
   fl = await p6.req("/api/scenarios/flood/complete", { method: "POST", body: { answers: floodBest } });
   ok(fl.json?.result?.score === 100 && fl.json.result.passed && fl.json.newBadges.includes("flood_survivor"), "flood: best choices pass and earn Flood Survivor");
+  // Membership updates and cancellation
+  ok(await stripeEvent("customer.subscription.updated", { id: "sub_1", object: "subscription", customer: "cus_member", status: "active", metadata: {}, items: { data: [{ price: { recurring: { interval: "year" } }, current_period_end: 1893456000 }] } }) === 200
+    && sql(`select \\\"subInterval\\\" from \\\"Player\\\" where \\\"stripeCustomerId\\\"='cus_member'`) === "year", "webhook: subscription update stores the yearly plan");
+  await stripeEvent("customer.subscription.deleted", { id: "sub_1", object: "subscription", customer: "cus_member", status: "canceled", metadata: {}, items: { data: [] } });
+  r = await p6.req("/room/security");
+  ok(r.status !== 200 && r.location?.includes("/upgrade"), "cancelled membership: Room 3 is members-only again");
+  ok((await p6.req("/room/medical")).status === 200, "cancelled membership: free rooms stay open");
 }
 
 // Admin & safety review

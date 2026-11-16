@@ -1,4 +1,6 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { getPlayer } from "@/lib/session";
+import { needsPlan } from "@/lib/plan";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { liveScenario } from "@/lib/content";
@@ -9,6 +11,7 @@ export default async function ScenarioReview({ params }: { params: Promise<{ id:
   const { id } = await params;
   const sc = await liveScenario(id);
   if (!sc) notFound();
+  if (needsPlan(id, await getPlayer().catch(() => null))) redirect("/upgrade");
   const lang = asLang((await cookies()).get(LANG_COOKIE)?.value);
   const s = STRINGS[lang];
   const mark = { best: "✅", poor: "🟡", unsafe: "⚠️" } as const;
