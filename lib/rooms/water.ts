@@ -173,11 +173,193 @@ export const waterRoom: Room = {
  ],
  "stages": [
   {
+   "key": "place",
+   "kind": "place",
+   "w": 0.2,
+   "label": {
+    "en": "Stage 2 · Place",
+    "ht": "Etap 2 · Plase"
+   },
+   "cat": {
+    "en": "Safe placement",
+    "ht": "Plase san danje"
+   },
+   "zones": [
+    {
+     "id": "shelf",
+     "label": {
+      "en": "Cool, dark shelf off the floor",
+      "ht": "Etajè fre, nan nwa, pa atè"
+     },
+     "x": 10,
+     "y": 10,
+     "w": 165,
+     "h": 87
+    },
+    {
+     "id": "high",
+     "label": {
+      "en": "High locked cabinet",
+      "ht": "Kabinè wo ki fèmen akle"
+     },
+     "x": 185,
+     "y": 10,
+     "w": 165,
+     "h": 87
+    },
+    {
+     "id": "kitchen",
+     "label": {
+      "en": "Kitchen counter",
+      "ht": "Kontwa kwizin nan"
+     },
+     "x": 10,
+     "y": 107,
+     "w": 165,
+     "h": 87
+    },
+    {
+     "id": "window",
+     "label": {
+      "en": "Sunny window ledge",
+      "ht": "Rebò fenèt nan solèy"
+     },
+     "x": 185,
+     "y": 107,
+     "w": 165,
+     "h": 87
+    },
+    {
+     "id": "fuel",
+     "label": {
+      "en": "Next to fuel & paint cans",
+      "ht": "Bò galon gaz ak penti"
+     },
+     "x": 10,
+     "y": 204,
+     "w": 165,
+     "h": 87
+    },
+    {
+     "id": "kids",
+     "label": {
+      "en": "Kids' play corner (low, open)",
+      "ht": "Kwen jwèt timoun (ba, louvri)"
+     },
+     "x": 185,
+     "y": 204,
+     "w": 165,
+     "h": 87
+    }
+   ],
+   "items": [
+    {
+     "id": "jugs",
+     "e": "🛢️",
+     "name": {
+      "en": "Water jugs",
+      "ht": "Galon dlo"
+     },
+     "ok": [
+      "shelf"
+     ],
+     "unsafe": [
+      "fuel"
+     ],
+     "why": {
+      "ok": {
+       "en": "Cool, dark and off the floor keeps stored water fresh.",
+       "ht": "Yon kote fre, nan nwa, pa atè kenbe dlo a fre."
+      },
+      "wrong": {
+       "en": "Heat and sun spoil stored water and weaken plastic. Keep it cool and dark.",
+       "ht": "Chalè ak solèy gate dlo ou sere a epi yo fè plastik la fèb. Kenbe l fre e nan nwa."
+      },
+      "unsafe": {
+       "en": "Fuel and paint fumes can get into plastic jugs and contaminate the water.",
+       "ht": "Lafimen gaz ak penti ka antre nan galon plastik yo epi kontamine dlo a."
+      }
+     }
+    },
+    {
+     "id": "bleach",
+     "e": "🧴",
+     "name": {
+      "en": "Bleach & eyedropper",
+      "ht": "Klowòks ak konngout"
+     },
+     "ok": [
+      "high"
+     ],
+     "unsafe": [
+      "kids"
+     ],
+     "why": {
+      "ok": {
+       "en": "Up high and locked: children can't reach it, and it can't spill on food or water.",
+       "ht": "Wo epi fèmen akle: timoun pa ka rive ladan l, epi li pa ka koule sou manje oswa dlo."
+      },
+      "wrong": {
+       "en": "Bleach needs its own high, locked spot, away from food, water and children.",
+       "ht": "Klowòks bezwen pwòp kote pa l, wo e fèmen akle, lwen manje, dlo ak timoun."
+      },
+      "unsafe": {
+       "en": "Within a child's reach, bleach can poison or burn. Always store it up high and locked.",
+       "ht": "Si timoun ka rive ladan l, klowòks ka anpwazonnen oswa brile yo. Toujou sere l wo epi fèmen akle."
+      }
+     }
+    },
+    {
+     "id": "pot",
+     "e": "🍲",
+     "name": {
+      "en": "Pot for boiling water",
+      "ht": "Chodyè pou bouyi dlo"
+     },
+     "ok": [
+      "kitchen"
+     ],
+     "why": {
+      "ok": {
+       "en": "Right where you cook, ready to boil water fast.",
+       "ht": "Kote ou kwit manje a, pare pou bouyi dlo vit."
+      },
+      "wrong": {
+       "en": "Keep the pot where you cook so you can boil water quickly when you need to.",
+       "ht": "Kenbe chodyè a kote ou kwit manje pou ou ka bouyi dlo vit lè ou bezwen."
+      }
+     }
+    },
+    {
+     "id": "filters",
+     "e": "🧻",
+     "name": {
+      "en": "Clean cloths & coffee filters",
+      "ht": "Twal pwòp ak filt kafe"
+     },
+     "ok": [
+      "kitchen",
+      "shelf"
+     ],
+     "why": {
+      "ok": {
+       "en": "Clean, dry and close to where you treat water.",
+       "ht": "Pwòp, sèk, epi toupre kote ou trete dlo a."
+      },
+      "wrong": {
+       "en": "Keep them clean and dry, next to your water or your cooking area.",
+       "ht": "Kenbe yo pwòp e sèk, bò dlo ou oswa bò kote ou kwit manje."
+      }
+     }
+    }
+   ]
+  },
+  {
    "key": "store",
    "w": 0.2,
    "label": {
-    "en": "Stage 2 · Store",
-    "ht": "Etap 2 · Sere"
+    "en": "Stage 3 · Store",
+    "ht": "Etap 3 · Sere"
    },
    "cat": {
     "en": "Safe storage",
@@ -259,8 +441,8 @@ export const waterRoom: Room = {
    "key": "calc",
    "w": 0.2,
    "label": {
-    "en": "Stage 3 · Calculate",
-    "ht": "Etap 3 · Kalkile"
+    "en": "Stage 4 · Calculate",
+    "ht": "Etap 4 · Kalkile"
    },
    "cat": {
     "en": "Planning amounts",
@@ -338,8 +520,8 @@ export const waterRoom: Room = {
    "key": "emerg",
    "w": 0.3,
    "label": {
-    "en": "Stage 4 · Emergency",
-    "ht": "Etap 4 · Ijans"
+    "en": "Stage 5 · Emergency",
+    "ht": "Etap 5 · Ijans"
    },
    "cat": {
     "en": "Emergency response",

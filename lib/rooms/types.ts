@@ -24,14 +24,48 @@ export interface Question {
   ht: QText;
 }
 
-export interface Stage {
+interface StageBase {
   key: string;
   w: number;
   label: Tx;
   cat: Tx;
   scene?: Tx;
+}
+
+/** Multiple-choice questions. */
+export interface QuizStage extends StageBase {
+  kind?: "quiz";
   qs: Question[];
 }
+
+/** A spot in the drawn room where items can be dropped (coordinates in a 360×300 plan). */
+export interface PlaceZone {
+  id: string;
+  label: Tx;
+  x: number; y: number; w: number; h: number;
+}
+
+export interface PlaceItem {
+  id: string;
+  e: string;
+  name: Tx;
+  /** Zones that are correct for this item (several layouts can be valid). */
+  ok: string[];
+  /** Zones that are dangerous for this item. Placing it there is a critical safety error. */
+  unsafe?: string[];
+  why: { ok: Tx; wrong: Tx; unsafe?: Tx };
+}
+
+/** Drag-and-drop placement: every item is judged correct, incorrect or unsafe. */
+export interface PlaceStage extends StageBase {
+  kind: "place";
+  zones: PlaceZone[];
+  items: PlaceItem[];
+}
+
+export type Stage = QuizStage | PlaceStage;
+
+export const stageLength = (S: Stage) => (S.kind === "place" ? S.items.length : S.qs.length);
 
 export interface RoomUI {
   room: string;
@@ -54,7 +88,8 @@ export interface Room {
   sources: [string, string][];
 }
 
-/** What a player submits at the end of a room. */
+/** What a player submits at the end of a room.
+ *  Quiz stages: chosen option index per question. Place stages: chosen zone index per item. */
 export interface RoomAnswers {
   sort: Bin[];
   stages: Record<string, number[]>;
