@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type { Prisma } from "@prisma/client";
 import { getRoom } from "@/lib/rooms";
 import { scoreRoom, validateAnswers } from "@/lib/scoring";
 import { prisma, dbEnabled } from "@/lib/db";
@@ -27,8 +28,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         data: {
           playerId: player.id, roomId: room.id, score: result.score, passed: result.passed,
           criticalErrors: result.criticalMisses.length,
-          breakdown: { categories: result.categories, criticalMisses: result.criticalMisses, level: result.level },
-          answers: answers as object,
+          breakdown: { categories: result.categories, criticalMisses: result.criticalMisses, level: result.level } as unknown as Prisma.InputJsonValue,
+          answers: answers as unknown as Prisma.InputJsonValue,
         },
       });
       const prev = await tx.roomProgress.findUnique({ where: { playerId_roomId: { playerId: player.id, roomId: room.id } } });
