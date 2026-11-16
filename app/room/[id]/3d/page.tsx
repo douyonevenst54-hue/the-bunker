@@ -18,10 +18,15 @@ export default async function Room3DPage({ params }: { params: Promise<{ id: str
   const room = await liveRoom(id);
   if (!room) notFound();
   const player = await getPlayer().catch(() => null);
-  const st = (await getRoomStatuses(player?.id ?? null)).find((r) => r.id === id);
+  const statuses = await getRoomStatuses(player?.id ?? null);
+  const st = statuses.find((r) => r.id === id);
   if (!st?.unlocked) redirect("/");
   if (needsPlan(id, player)) redirect("/upgrade");
   const lang = asLang((await cookies()).get(LANG_COOKIE)?.value);
-  const others = ROOMS.filter((r) => r.id !== id).map((r) => `${r.emoji} ${r.ui[lang].room.split("·").pop()!.trim()}`);
+  const others = ROOMS.filter((r) => r.id !== id).map((r) => {
+    const s2 = statuses.find((x) => x.id === r.id);
+    const mark = s2?.passed ? "✅" : s2?.unlocked && !needsPlan(r.id, player) ? "🚪" : s2?.unlocked ? "💎" : "🔒";
+    return `${mark} ${r.emoji} ${r.ui[lang].room.split("·").pop()!.trim()}`;
+  });
   return <Room3DLoader room={room} otherRooms={others} />;
 }

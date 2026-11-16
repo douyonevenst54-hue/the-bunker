@@ -10,9 +10,12 @@ import type { StringKey } from "@/lib/i18n";
 export type Save = "saving" | "saved" | "failed";
 
 /** Score, critical errors, categories, new badges, checklist and sources. Shared by the 2D and 3D rooms. */
-export default function RoomResults({ room, result, save, newBadges, onRestart, progress }: {
-  room: Room; result: RoomResult; save: Save; newBadges: string[]; onRestart: () => void; progress?: React.ReactNode;
+export default function RoomResults({ room, result, save, newBadges, onRestart, progress, nextHref, hardNav }: {
+  room: Room; result: RoomResult; save: Save; newBadges: string[]; onRestart: () => void; progress?: React.ReactNode; nextHref?: string;
+  /** Use plain links (full page load). The 3D view needs this: tearing down the 3D scene during a client-side route change can throw. */
+  hardNav?: boolean;
 }) {
+  const A = hardNav ? "a" : Link;
   const { lang, t } = useLang();
   const [copied, setCopied] = useState(false);
   const ui = room.ui[lang];
@@ -63,10 +66,10 @@ export default function RoomResults({ room, result, save, newBadges, onRestart, 
         )}
         <div className="status">{save === "saving" ? t("saving") : save === "saved" ? t("saved") : t("notSaved")}</div>
         {r.passed && room.next
-          ? <Link className="btn" href={`/room/${room.next}`}>{t("nextRoom")} →</Link>
+          ? <A className="btn" href={nextHref ?? `/room/${room.next}`}>{t("nextRoom")} →</A>
           : !r.passed && <p className="status">{t("unlockHint")}</p>}
         <button className={`btn ${r.passed && room.next ? "ghost" : ""}`} onClick={onRestart}>{t("again")}</button>
-        <Link className="btn ghost" href="/">{t("backToBunker")}</Link>
+        <A className="btn ghost" href="/">{t("backToBunker")}</A>
       </div>
 
       <div className="card" style={{ marginTop: 14 }}>
