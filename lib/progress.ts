@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma, dbEnabled } from "./db";
 import { ROOMS } from "./rooms";
+import { earnedBadgeIds, type AttemptLite } from "./badges";
 
 export interface RoomStatus {
   id: string;
@@ -26,6 +27,24 @@ export async function getRoomStatuses(playerId: string | null): Promise<RoomStat
     const prevPassed = i === 0 || Boolean(by.get(ROOMS[i - 1].id)?.passed);
     return { id: room.id, unlocked: prevPassed, played: Boolean(r), passed: Boolean(r?.passed), bestScore: r?.bestScore ?? null };
   });
+}
+
+/** Attempt history (oldest first) used for badges. */
+export async function getAttempts(playerId: string | null): Promise<AttemptLite[]> {
+  if (!dbEnabled || !playerId) return [];
+  try {
+    return await prisma.roomAttempt.findMany({
+      where: { playerId }, orderBy: { createdAt: "asc" },
+      select: { roomId: true, score: true, passed: true },
+    });
+  } catch (e) {
+    console.error("attempt lookup failed", e);
+    return [];
+  }
+}
+
+export async function getBadgeIds(playerId: string | null): Promise<string[]> {
+  return earnedBadgeIds(await getAttempts(playerId));
 }
 
 /** Moves a guest's progress into an account, keeping the better result per room. */

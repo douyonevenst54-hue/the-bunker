@@ -37,7 +37,8 @@ const sql = (q) => execSync(`psql "${process.env.DATABASE_URL}" -tAc "${q}"`).to
 
 const g = new Client();
 let r = await g.req("/");
-ok(r.status === 200 && r.text.includes("Water"), "dashboard loads for a new visitor");
+ok(r.status === 200 && r.text.includes("bunker-map") && r.text.includes("Water"), "dashboard shows the bunker map");
+ok(r.text.includes('href="/room/water"') && !r.text.includes('href="/room/medical"'), "map: Room 1 is clickable, Room 2 is not");
 r = await g.req("/room/medical");
 ok(r.status === 307 || r.status === 303 || r.status === 302, "Room 2 is locked for a new visitor (redirects)");
 r = await g.req("/medical");
@@ -53,11 +54,15 @@ ok(r.status === 404, "unknown room is rejected");
 r = await g.req("/api/rooms/water/complete", { method: "POST", body: { answers: withCriticalMiss(water), score: 100 } });
 ok(r.status === 200 && r.json?.saved && r.json.result.passed === false && r.json.result.score >= 90, "critical miss: high score but NOT passed (client 'score' ignored)");
 ok(g.cookies.has("bunker_session"), "guest session cookie created on first save");
+ok(JSON.stringify(r.json?.newBadges) === '["first_steps"]', "first finish earns only 'First Steps'");
 r = await g.req("/room/medical");
 ok(r.status !== 200, "Room 2 still locked after a critical miss");
 
 r = await g.req("/api/rooms/water/complete", { method: "POST", body: { answers: perfect(water) } });
 ok(r.json?.result?.score === 100 && r.json.result.passed, "perfect run passes");
+ok(["water_guardian", "perfect", "comeback"].every((b) => r.json?.newBadges?.includes(b)) && !r.json.newBadges.includes("first_try"), "pass after a miss: Water Guardian + Perfect + Never Give Up (not first try)");
+r = await g.req("/");
+ok(r.text.includes('href="/room/medical"') && r.text.includes("100/100"), "map updates: Room 1 shows 100/100, Room 2 clickable");
 r = await g.req("/room/medical");
 ok(r.status === 200, "Room 2 unlocks after passing Room 1");
 const guestId = sql("select id from \\\"Player\\\" where email is null order by \\\"createdAt\\\" limit 1");
@@ -82,7 +87,7 @@ ok(r.status === 401, "wrong password rejected");
 const g2 = new Client();
 const medical = ROOMS.find((x) => x.id === "medical");
 r = await g2.req("/api/rooms/medical/complete", { method: "POST", body: { answers: perfect(medical) } });
-ok(r.json?.saved, "second guest saves a Room 2 result");
+ok(r.json?.saved && r.json.newBadges.includes("first_try"), "second guest saves a Room 2 result and earns 'Ready on Day One'");
 r = await g2.req("/api/auth/login", { method: "POST", body: { email: "test@example.com", password: "longenough1" } });
 ok(r.status === 200, "login works");
 ok(sql(`select count(*) from \\\"RoomProgress\\\" where \\\"playerId\\\"='${guestId}'`) === "2", "guest progress merged into account on login");
