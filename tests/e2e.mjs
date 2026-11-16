@@ -106,6 +106,24 @@ ok(r.status === 200, "login works");
 ok(sql(`select count(*) from \\\"RoomProgress\\\" where \\\"playerId\\\"='${guestId}'`) === "2", "guest progress merged into account on login");
 ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merged guest record removed");
 
+// Full bunker: six rooms in order
+{
+  const p6 = new Client();
+  let allOk = true, lockedOk = true;
+  for (const [i, room] of ROOMS.entries()) {
+    if (i + 1 < ROOMS.length) { const nx = await p6.req("/room/" + ROOMS[i + 1].id); if (nx.status === 200) lockedOk = false; }
+    const res = await p6.req(`/api/rooms/${room.id}/complete`, { method: "POST", body: { answers: perfect(room) } });
+    if (!(res.json?.result?.score === 100 && res.json.result.passed)) allOk = false;
+    if (i === ROOMS.length - 1) ok(res.json.newBadges.includes("bunker_complete") && res.json.newBadges.includes("power_keeper"), "passing Room 6 earns Power Keeper + Bunker Commander");
+  }
+  ok(ROOMS.length === 6 && allOk, "all six rooms: a perfect run scores 100 and passes");
+  ok(lockedOk, "each room stays locked until the one before it is passed");
+  const dash = await p6.req("/");
+  ok(ROOMS.every((r) => dash.text.includes(`href="/room/${r.id}"`)) && dash.text.includes("6<!-- --> / <!-- -->6"), "map: all six rooms open, 6 / 6 passed");
+  for (const r of ROOMS) { const rv = await p6.req(`/room/${r.id}/review`); if (rv.status !== 200) ok(false, "review page " + r.id); }
+  ok(true, "review pages load for all six rooms");
+}
+
 // Forgot password
 const { readFileSync } = await import("node:fs");
 const lastToken = () => [...readFileSync(process.env.NEXT_LOG || "/tmp/next.log", "utf8").matchAll(/reset\?token=([A-Za-z0-9_-]+)/g)].pop()?.[1];
