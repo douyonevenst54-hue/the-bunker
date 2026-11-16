@@ -61,7 +61,7 @@ ok(r.json?.result?.score === 100 && r.json.result.passed, "perfect run passes");
 r = await g.req("/room/medical");
 ok(r.status === 200, "Room 2 unlocks after passing Room 1");
 const guestId = sql("select id from \\\"Player\\\" where email is null order by \\\"createdAt\\\" limit 1");
-ok(sql(`select attempts||','||\\\"bestScore\\\"||','||passed from \\\"RoomProgress\\\" where \\\"playerId\\\"='${guestId}'`) === "2,100,t", "progress row: 2 attempts, best 100, passed");
+ok(sql(`select attempts||','||\\\"bestScore\\\"||','||passed from \\\"RoomProgress\\\" where \\\"playerId\\\"='${guestId}'`) === "2,100,true", "progress row: 2 attempts, best 100, passed");
 
 // Register upgrades the guest in place
 r = await g.req("/api/auth/register", { method: "POST", body: { email: "Test@Example.com", password: "short" } });
