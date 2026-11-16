@@ -65,6 +65,7 @@ await cta.click();
 await page.waitForURL("**/room/water/3d");
 await play(ROOMS.find((r) => r.id === "water"));
 
+ok(errors.length === 0, "water: no page errors during the 3D run" + (errors.length ? ": " + errors.join(" | ") : ""));
 // "Next room" from the 3D Water room leads to the 3D Medical room
 await page.getByRole("link", { name: /Next room/ }).click();
 await page.waitForURL("**/room/medical/3d");

@@ -1,6 +1,5 @@
 "use client";
 import { useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import { Canvas } from "@react-three/fiber";
 import { stageLength, type Bin, type Room, type RoomAnswers } from "@/lib/rooms/types";
 import { judgePlacement, scoreRoom, type Placement, type RoomResult } from "@/lib/scoring";
@@ -285,14 +284,14 @@ export default function Room3D({ room, otherRooms }: { room: Room; otherRooms: s
         </Canvas>
       </div>
       <div className="b3-top">
-        <Link href="/" className="b3-x" aria-label={t("exit3d")}>✕</Link>
+        <a href="/" className="b3-x" aria-label={t("exit3d")}>✕</a>
         <span className="b3-title">{room.emoji} {ui.room}</span>
-        <Link href={`/room/${room.id}`} className="b3-lite">{t("lite")}</Link>
+        <a href={`/room/${room.id}`} className="b3-lite">{t("lite")}</a>
       </div>
       {phase === "results" && result ? (
         <div className="b3-results">
           <RoomResults room={room} result={result} save={save} newBadges={newBadges} onRestart={restart}
-            nextHref={room.next && ROOMS_3D.includes(room.next) ? `/room/${room.next}/3d` : undefined} />
+            nextHref={room.next && ROOMS_3D.includes(room.next) ? `/room/${room.next}/3d` : undefined} hardNav />
         </div>
       ) : panel}
     </div>
