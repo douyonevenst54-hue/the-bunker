@@ -170,3 +170,28 @@ a:hover .map-room .box,a:focus .map-room .box{filter:brightness(1.3)}
 .tl.unsafe{border-left-color:var(--bad)}
 .tl b{color:var(--muted);font-weight:600}
 .review-links .btn{margin-top:8px}
+/* --- step 6b: admin --- */
+.reviewed{margin-top:12px;font-size:12.5px;color:var(--good);text-align:center}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.kpis div{background:var(--panel2);border-radius:10px;padding:10px;text-align:center}
+.kpis b{display:block;font:700 24px Oswald,sans-serif}
+.kpis span{font-size:12px;color:var(--muted)}
+.admin-row{margin-top:12px}
+.ar-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ar-head h3{font-size:15px}
+.ar-head .go{font:700 12px Inter,sans-serif;background:var(--amber);color:#1a1205;border-radius:8px;padding:7px 10px;text-decoration:none;white-space:nowrap}
+.ar-stats{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin-top:8px}
+.ar-stats .bad{color:var(--bad)}
+.misses{margin:8px 0 0 18px;font-size:12.5px;line-height:1.5}
+.misses b{color:var(--mid);font-weight:600}
+.ar-sign{font-size:12.5px;margin-top:8px;color:var(--muted)}
+.rev,.pair{background:var(--panel2);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:13.5px;line-height:1.45}
+.rev-path{font:600 11px Inter,sans-serif;color:var(--muted);margin-bottom:4px;word-break:break-all}
+.rev-old{color:var(--bad)}
+.rev-new{color:var(--good)}
+.rev-note{color:var(--muted);font-size:12.5px;margin-top:4px}
+.rev-actions{display:flex;gap:8px}
+.rev-actions .btn{margin-top:8px}
+.pair-ht{color:var(--muted);margin-top:2px}
+.form textarea{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--text);font:14px Inter,sans-serif;padding:10px}
+h3{font-family:Oswald,sans-serif;font-size:18px;margin-bottom:6px}

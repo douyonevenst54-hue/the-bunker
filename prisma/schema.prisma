@@ -16,11 +16,16 @@ model Player {
   email        String?        @unique
   passwordHash String?
   displayName  String?
+  /// player | admin. Accounts listed in ADMIN_EMAILS are also admins.
+  role         String         @default("player")
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   attempts     RoomAttempt[]
   progress     RoomProgress[]
   resetTokens  PasswordResetToken[]
+  revisionsAuthored ContentRevision[] @relation("author")
+  revisionsReviewed ContentRevision[] @relation("reviewer")
+  signoffs     ContentSignoff[]
 }
 
 /// Every finished playthrough of a room, scored on the server.
@@ -64,4 +69,38 @@ model PasswordResetToken {
   createdAt DateTime  @default(now())
 
   @@index([playerId, createdAt])
+}
+
+/// A proposed text change to room or scenario content. Only approved revisions reach players.
+/// This table is also the audit log of every content change.
+model ContentRevision {
+  id           String    @id @default(cuid())
+  contentId    String    // room id or scenario id
+  path         String    // e.g. "items.3.ht.1"
+  oldValue     String
+  newValue     String
+  note         String?
+  status       String    @default("pending") // pending | approved | rejected
+  authorId     String
+  author       Player    @relation("author", fields: [authorId], references: [id])
+  reviewerId   String?
+  reviewer     Player?   @relation("reviewer", fields: [reviewerId], references: [id])
+  selfApproved Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  reviewedAt   DateTime?
+
+  @@index([contentId, status])
+}
+
+/// Expert sign-off that a room's content was reviewed (shown to players with the date).
+model ContentSignoff {
+  id         String   @id @default(cuid())
+  contentId  String
+  reviewerId String
+  reviewer   Player   @relation(fields: [reviewerId], references: [id])
+  reviewerName String
+  note       String?
+  createdAt  DateTime @default(now())
+
+  @@index([contentId, createdAt])
 }

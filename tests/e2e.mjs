@@ -143,6 +143,40 @@ ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merg
   ok(anon.status === 403, "scenario can't be submitted by a player who hasn't passed the rooms");
 }
 
+// Admin & safety review
+{
+  const adm = new Client();
+  const viewer = new Client(); // Room 1 is open to anyone
+  await adm.req("/api/auth/register", { method: "POST", body: { email: "admin@example.com", password: "adminpass1", name: "Dr. Test" } });
+  ok((await adm.req("/admin")).status === 200, "admin dashboard loads for an ADMIN_EMAILS account");
+  ok((await new Client().req("/admin")).status === 404, "admin dashboard hidden from guests");
+  ok((await g.req("/admin")).status === 404, "admin dashboard hidden from regular players");
+  const dashA = await adm.req("/admin");
+  ok(dashA.text.includes("% passed") && dashA.text.includes("missed"), "dashboard shows pass rates and most-missed questions");
+
+  const NEW = "Safe water for every family";
+  r = await g.req("/api/admin/revisions", { method: "POST", body: { contentId: "water", path: "ui.en.title", newValue: NEW } });
+  ok(r.status === 403, "non-admin can't propose edits");
+  r = await adm.req("/api/admin/revisions", { method: "POST", body: { contentId: "water", path: "items.0.b", newValue: "a" } });
+  ok(r.status === 400, "answer keys can't be edited from the admin panel");
+  r = await adm.req("/api/admin/revisions", { method: "POST", body: { contentId: "water", path: "ui.en.title", newValue: NEW, note: "clearer" } });
+  ok(r.status === 200 && r.json?.id, "admin proposes a text edit");
+  const revId = r.json.id;
+  ok(!(await viewer.req("/room/water")).text.includes(NEW), "pending edit is NOT shown to players");
+  ok((await adm.req("/admin/content/water")).text.includes(NEW), "content page lists the pending edit");
+  r = await adm.req("/api/admin/signoff", { method: "POST", body: { contentId: "water" } });
+  ok(r.status === 409, "can't sign off while edits are pending");
+  r = await adm.req(`/api/admin/revisions/${revId}`, { method: "POST", body: { action: "approve" } });
+  ok(r.status === 200, "admin approves the edit");
+  ok((await viewer.req("/room/water")).text.includes(NEW), "approved edit reaches players");
+  ok(sql(`select status||','||\\\"selfApproved\\\" from \\\"ContentRevision\\\" where id='${revId}'`) === "approved,true", "audit log records approval (flagged self-approved)");
+  r = await adm.req("/api/admin/signoff", { method: "POST", body: { contentId: "water", name: "Dr. Test, MD" } });
+  ok(r.status === 200, "admin signs off the room");
+  ok((await viewer.req("/room/water")).text.includes("Content reviewed by") && (await viewer.req("/room/water")).text.includes("Dr. Test, MD"), "players see who reviewed the room");
+  r = await adm.req("/api/admin/revisions", { method: "POST", body: { contentId: "power-outage", path: "events.0.text.ht", newValue: "Limyè yo etenn. Kijan ou klere kay la?" } });
+  ok(r.status === 200, "scenario text is editable too");
+}
+
 // Forgot password
 const { readFileSync } = await import("node:fs");
 const lastToken = () => [...readFileSync(process.env.NEXT_LOG || "/tmp/next.log", "utf8").matchAll(/reset\?token=([A-Za-z0-9_-]+)/g)].pop()?.[1];

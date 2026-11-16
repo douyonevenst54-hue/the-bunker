@@ -1,13 +1,13 @@
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { getRoom } from "@/lib/rooms";
+import { liveRoom } from "@/lib/content";
 import { asLang, LANG_COOKIE, STRINGS } from "@/lib/i18n";
 
 /** Expert review page: every item and question with its correct answer and explanation. */
 export default async function Review({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const room = getRoom(id);
+  const room = await liveRoom(id);
   if (!room) notFound();
   const lang = asLang((await cookies()).get(LANG_COOKIE)?.value);
   const s = STRINGS[lang];
