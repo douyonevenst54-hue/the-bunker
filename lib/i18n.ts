@@ -22,6 +22,8 @@ const en = {
   statusNew: "Not started", statusPassed: "Passed", statusRetry: "Try again to unlock the next room",
   guestNote: "You're playing as a guest. Create a free account to keep your progress on any device.",
   mapLabel: "Map of your bunker", entrance: "ENTRANCE", corridor: "CORRIDOR",
+  placeHint: "Drag each item to the right spot in the room. Or tap an item, then tap a spot.",
+  tapSpot: "Now tap a spot in the room.", unsafe: "Unsafe", bestSpot: "Best spot",
   badges: "Badges", continueWith: "Continue", newBadges: "New badge earned!",
   // account
   account: "Account", createAccount: "Create free account", signIn: "Sign in", signOut: "Sign out",
@@ -59,6 +61,8 @@ const ht: typeof en = {
   statusNew: "Poko kòmanse", statusPassed: "Reyisi", statusRetry: "Eseye ankò pou debloke pwochen chanm nan",
   guestNote: "W ap jwe kòm envite. Kreye yon kont gratis pou kenbe pwogrè w sou nenpòt aparèy.",
   mapLabel: "Plan bunker ou", entrance: "ANTRE", corridor: "KORIDÒ",
+  placeHint: "Rale chak bagay mete l nan bon kote nan chanm nan. Oswa peze yon bagay, epi peze yon kote.",
+  tapSpot: "Kounye a, peze yon kote nan chanm nan.", unsafe: "Danjere", bestSpot: "Pi bon kote",
   badges: "Badj", continueWith: "Kontinye", newBadges: "Nouvo badj!",
   account: "Kont", createAccount: "Kreye kont gratis", signIn: "Konekte", signOut: "Dekonekte",
   email: "Imèl", password: "Modpas (8 karaktè oswa plis)", name: "Prenon (si ou vle)",

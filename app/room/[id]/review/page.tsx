@@ -30,7 +30,19 @@ export default async function Review({ params }: { params: Promise<{ id: string 
         <div className="review-sec" key={S.key}>
           <div className="stage">{S.label[lang]}</div>
           {S.scene && <p>{S.scene[lang]}</p>}
-          {S.qs.map((q, i) => (
+          {S.kind === "place" ? S.items.map((it) => (
+            <div className="review-q" key={it.id}>
+              <div className="qq">{it.e} {it.name[lang]}{it.unsafe?.length ? " ⚠️" : ""}</div>
+              {S.zones.map((z) => it.ok.includes(z.id)
+                ? <div className="ok" key={z.id}>✅ {z.label[lang]}</div>
+                : it.unsafe?.includes(z.id)
+                  ? <div className="bad" key={z.id} style={{ color: "var(--bad)" }}>⚠️ {z.label[lang]}</div>
+                  : <div className="bad" key={z.id}>✗ {z.label[lang]}</div>)}
+              <div className="ex">✅ {it.why.ok[lang]}</div>
+              <div className="ex">✗ {it.why.wrong[lang]}</div>
+              {it.why.unsafe && <div className="ex">⚠️ {it.why.unsafe[lang]}</div>}
+            </div>
+          )) : S.qs.map((q, i) => (
             <div className="review-q" key={i}>
               <div className="qq">{q[lang].q}{q.critical ? " ⚠️" : ""}</div>
               {q[lang].o.map((o, k) => k === q.a

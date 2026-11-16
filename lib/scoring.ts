@@ -1,4 +1,14 @@
-import type { Room, RoomAnswers } from "./rooms/types";
+import { stageLength, type PlaceItem, type PlaceStage, type Room, type RoomAnswers } from "./rooms/types";
+
+export type Placement = "correct" | "incorrect" | "unsafe";
+
+/** Judges one placement. Exported so the game can give instant feedback with the same rules. */
+export function judgePlacement(S: PlaceStage, item: PlaceItem, zoneIndex: number): Placement {
+  const zone = S.zones[zoneIndex]?.id;
+  if (zone && item.ok.includes(zone)) return "correct";
+  if (zone && item.unsafe?.includes(zone)) return "unsafe";
+  return "incorrect";
+}
 
 export type Level = "expert" | "well" | "improve" | "training";
 
@@ -37,9 +47,10 @@ export function validateAnswers(room: Room, a: unknown): RoomAnswers {
   }
   for (const S of room.stages) {
     const arr = ans.stages[S.key];
-    if (!Array.isArray(arr) || arr.length !== S.qs.length) throw new Error(`Missing answers for ${S.key}`);
+    if (!Array.isArray(arr) || arr.length !== stageLength(S)) throw new Error(`Missing answers for ${S.key}`);
     arr.forEach((v, i) => {
-      if (!Number.isInteger(v) || v < 0 || v >= S.qs[i].en.o.length) throw new Error(`Invalid answer in ${S.key}`);
+      const max = S.kind === "place" ? S.zones.length : S.qs[i].en.o.length;
+      if (!Number.isInteger(v) || v < 0 || v >= max) throw new Error(`Invalid answer in ${S.key}`);
     });
   }
   return { sort: ans.sort, stages: Object.fromEntries(room.stages.map((S) => [S.key, ans.stages[S.key]])) };
@@ -63,12 +74,21 @@ export function scoreRoom(room: Room, ans: RoomAnswers): RoomResult {
 
   for (const S of room.stages) {
     let c = 0;
-    S.qs.forEach((q, i) => {
-      if (ans.stages[S.key][i] === q.a) c++;
-      else if (q.critical) criticalMisses.push(q.en.q);
-    });
-    categories.push({ key: S.key, correct: c, total: S.qs.length });
-    weighted += (c / S.qs.length) * S.w;
+    if (S.kind === "place") {
+      S.items.forEach((it, i) => {
+        const j = judgePlacement(S, it, ans.stages[S.key][i]);
+        if (j === "correct") c++;
+        else if (j === "unsafe") criticalMisses.push(it.name.en);
+      });
+    } else {
+      S.qs.forEach((q, i) => {
+        if (ans.stages[S.key][i] === q.a) c++;
+        else if (q.critical) criticalMisses.push(q.en.q);
+      });
+    }
+    const n = stageLength(S);
+    categories.push({ key: S.key, correct: c, total: n });
+    weighted += (c / n) * S.w;
     weightSum += S.w;
   }
 

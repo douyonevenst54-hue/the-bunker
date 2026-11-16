@@ -171,11 +171,186 @@ export const medicalRoom: Room = {
  ],
  "stages": [
   {
+   "key": "place",
+   "kind": "place",
+   "w": 0.2,
+   "label": {
+    "en": "Stage 2 · Place",
+    "ht": "Etap 2 · Plase"
+   },
+   "cat": {
+    "en": "Safe placement",
+    "ht": "Plase san danje"
+   },
+   "zones": [
+    {
+     "id": "closet",
+     "label": {
+      "en": "Hallway closet (everyone can reach)",
+      "ht": "Pandri koridò (tout moun ka rive)"
+     },
+     "x": 10,
+     "y": 10,
+     "w": 165,
+     "h": 87
+    },
+    {
+     "id": "highcab",
+     "label": {
+      "en": "High cabinet, out of children's reach",
+      "ht": "Kabinè wo, lwen men timoun"
+     },
+     "x": 185,
+     "y": 10,
+     "w": 165,
+     "h": 87
+    },
+    {
+     "id": "bath",
+     "label": {
+      "en": "Bathroom cabinet (hot, steamy showers)",
+      "ht": "Kabinè twalèt (douch cho, vapè)"
+     },
+     "x": 10,
+     "y": 107,
+     "w": 165,
+     "h": 87
+    },
+    {
+     "id": "fridge",
+     "label": {
+      "en": "Fridge door, next to the phone",
+      "ht": "Pòt frijidè a, bò telefòn nan"
+     },
+     "x": 185,
+     "y": 107,
+     "w": 165,
+     "h": 87
+    },
+    {
+     "id": "attic",
+     "label": {
+      "en": "Locked attic",
+      "ht": "Grenye fèmen akle"
+     },
+     "x": 10,
+     "y": 204,
+     "w": 165,
+     "h": 87
+    },
+    {
+     "id": "table",
+     "label": {
+      "en": "Living room table where kids play",
+      "ht": "Tab salon kote timoun jwe"
+     },
+     "x": 185,
+     "y": 204,
+     "w": 165,
+     "h": 87
+    }
+   ],
+   "items": [
+    {
+     "id": "kit",
+     "e": "🧰",
+     "name": {
+      "en": "First aid kit",
+      "ht": "Twous premye swen"
+     },
+     "ok": [
+      "closet"
+     ],
+     "why": {
+      "ok": {
+       "en": "Every second counts. Everyone in the family, and visitors, should know where the kit is and reach it fast.",
+       "ht": "Chak segonn konte. Tout moun nan fanmi an, ak vizitè yo, dwe konnen kote twous la ye epi rive jwenn li vit."
+      },
+      "wrong": {
+       "en": "The kit must be fast to grab. Keep it in one known spot that everyone can reach.",
+       "ht": "Fòk twous la fasil pou pran vit. Kenbe l nan yon sèl kote tout moun konnen e tout moun ka rive."
+      }
+     }
+    },
+    {
+     "id": "meds",
+     "e": "💊",
+     "name": {
+      "en": "Prescription medicines",
+      "ht": "Medikaman preskripsyon"
+     },
+     "ok": [
+      "highcab"
+     ],
+     "unsafe": [
+      "table"
+     ],
+     "why": {
+      "ok": {
+       "en": "Cool, dry, up high and out of children's sight. That's where medicines belong.",
+       "ht": "Fre, sèk, wo, epi lwen je timoun. Se la medikaman dwe ye."
+      },
+      "wrong": {
+       "en": "Heat and humidity, like a steamy bathroom, can break medicines down. Pick a cool, dry spot up high.",
+       "ht": "Chalè ak imidite, tankou yon twalèt plen vapè, ka gate medikaman. Chwazi yon kote fre, sèk, epi wo."
+      },
+      "unsafe": {
+       "en": "Children can mistake pills for candy. Every year thousands of young children end up in the emergency room after getting into medicines left within reach.",
+       "ht": "Timoun ka pran grenn pou sirèt. Chak ane, plizyè milye ti timoun fini nan sal ijans paske yo jwenn medikaman ki te kite kote yo ka rive."
+      }
+     }
+    },
+    {
+     "id": "contacts",
+     "e": "📋",
+     "name": {
+      "en": "Emergency contacts & medication list",
+      "ht": "Lis kontak ijans ak medikaman"
+     },
+     "ok": [
+      "fridge",
+      "closet"
+     ],
+     "why": {
+      "ok": {
+       "en": "Easy to see in a crisis, for you, a neighbor or a paramedic.",
+       "ht": "Fasil pou wè nan yon kriz, pou ou, yon vwazen oswa yon sekouris."
+      },
+      "wrong": {
+       "en": "This list must be found fast. Put it where anyone would look: by the phone or with the first aid kit.",
+       "ht": "Fòk yo jwenn lis sa a vit. Mete l kote nenpòt moun ta gade: bò telefòn nan oswa ak twous premye swen an."
+      }
+     }
+    },
+    {
+     "id": "gloves",
+     "e": "🧤",
+     "name": {
+      "en": "Gloves & gauze",
+      "ht": "Gan ak konprès"
+     },
+     "ok": [
+      "closet"
+     ],
+     "why": {
+      "ok": {
+       "en": "Kept with the kit, so everything you need to stop bleeding is in one place.",
+       "ht": "Ansanm ak twous la, konsa tout sa ou bezwen pou kanpe yon senyen nan yon sèl kote."
+      },
+      "wrong": {
+       "en": "Keep them with the first aid kit so you can grab everything at once.",
+       "ht": "Kenbe yo ak twous premye swen an pou ou ka pran tout bagay an menm tan."
+      }
+     }
+    }
+   ]
+  },
+  {
    "key": "store",
    "w": 0.2,
    "label": {
-    "en": "Stage 2 · Organize",
-    "ht": "Etap 2 · Òganize"
+    "en": "Stage 3 · Organize",
+    "ht": "Etap 3 · Òganize"
    },
    "cat": {
     "en": "Organizing the kit",
@@ -253,8 +428,8 @@ export const medicalRoom: Room = {
    "key": "triage",
    "w": 0.2,
    "label": {
-    "en": "Stage 3 · Recognize",
-    "ht": "Etap 3 · Rekonèt"
+    "en": "Stage 4 · Recognize",
+    "ht": "Etap 4 · Rekonèt"
    },
    "cat": {
     "en": "Recognizing emergencies",
@@ -333,8 +508,8 @@ export const medicalRoom: Room = {
    "key": "emerg",
    "w": 0.35,
    "label": {
-    "en": "Stage 4 · Emergency",
-    "ht": "Etap 4 · Ijans"
+    "en": "Stage 5 · Emergency",
+    "ht": "Etap 5 · Ijans"
    },
    "cat": {
     "en": "Emergency response",

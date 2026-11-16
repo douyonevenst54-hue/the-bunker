@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import type { Bin, Room, RoomAnswers } from "@/lib/rooms/types";
+import { stageLength, type Bin, type Room, type RoomAnswers } from "@/lib/rooms/types";
+import PlaceBoard from "./PlaceBoard";
 import { scoreRoom, type RoomResult } from "@/lib/scoring";
 import { useLang } from "./LangProvider";
 import { BADGES } from "@/lib/badges";
@@ -57,10 +58,15 @@ export default function RoomGame({ room }: { room: Room }) {
       else setScreen({ kind: "stage", s: 0, i: 0 });
     } else if (screen.kind === "stage") {
       const S = room.stages[screen.s];
-      if (screen.i + 1 < S.qs.length) setScreen({ kind: "stage", s: screen.s, i: screen.i + 1 });
-      else if (screen.s + 1 < room.stages.length) setScreen({ kind: "stage", s: screen.s + 1, i: 0 });
-      else finish();
+      if (screen.i + 1 < stageLength(S)) setScreen({ kind: "stage", s: screen.s, i: screen.i + 1 });
+      else nextStage(screen.s);
     }
+  }
+
+  function nextStage(s: number) {
+    setPicked(null);
+    if (s + 1 < room.stages.length) setScreen({ kind: "stage", s: s + 1, i: 0 });
+    else finish();
   }
 
   const progress = (
@@ -112,8 +118,23 @@ export default function RoomGame({ room }: { room: Room }) {
     );
   }
 
+  if (screen.kind === "stage" && room.stages[screen.s].kind === "place") {
+    const S = room.stages[screen.s];
+    if (S.kind !== "place") return null;
+    return (
+      <>{progress}
+        <div className="card">
+          <div className="stage">{S.label[lang]}</div>
+          {S.scene && <div className="scene"><div className="tag">{S.scene[lang]}</div></div>}
+          <PlaceBoard key={S.key} S={S} lang={lang} t={t} onDone={(z) => { ans.current.stages[S.key] = z; nextStage(screen.s); }} />
+        </div>
+      </>
+    );
+  }
+
   if (screen.kind === "stage") {
     const S = room.stages[screen.s];
+    if (S.kind === "place") return null;
     const q = S.qs[screen.i];
     const d = q[lang];
     const p = picked as number | null;
@@ -146,7 +167,10 @@ export default function RoomGame({ room }: { room: Room }) {
   const missedText = r.criticalMisses.map((en) => {
     const it = room.items.find((x) => x.en[0] === en);
     if (it) return it[lang][0];
-    for (const S of room.stages) { const q = S.qs.find((x) => x.en.q === en); if (q) return q[lang].q; }
+    for (const S of room.stages) {
+      if (S.kind === "place") { const p = S.items.find((x) => x.name.en === en); if (p) return `${p.e} ${p.name[lang]}`; }
+      else { const q = S.qs.find((x) => x.en.q === en); if (q) return q[lang].q; }
+    }
     return en;
   });
   return (

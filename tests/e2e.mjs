@@ -28,9 +28,14 @@ class Client {
 // Answers built from the real content
 const { ROOMS } = await import("../.test-build/rooms.mjs");
 const water = ROOMS.find((r) => r.id === "water");
-const perfect = (room) => ({ sort: room.items.map((i) => i.b), stages: Object.fromEntries(room.stages.map((S) => [S.key, S.qs.map((q) => q.a)])) });
+const best = (S) => S.kind === "place" ? S.items.map((it) => S.zones.findIndex((z) => it.ok.includes(z.id))) : S.qs.map((q) => q.a);
+const perfect = (room) => ({ sort: room.items.map((i) => i.b), stages: Object.fromEntries(room.stages.map((S) => [S.key, best(S)])) });
+const withUnsafePlacement = (room) => {
+  const a = perfect(room); const S = room.stages.find((s) => s.kind === "place");
+  const i = S.items.findIndex((it) => it.unsafe?.length); a.stages[S.key][i] = S.zones.findIndex((z) => z.id === S.items[i].unsafe[0]); return a;
+};
 const withCriticalMiss = (room) => {
-  const a = perfect(room); const S = room.stages.find((s) => s.qs.some((q) => q.critical));
+  const a = perfect(room); const S = room.stages.find((s) => s.qs?.some((q) => q.critical));
   const i = S.qs.findIndex((q) => q.critical); a.stages[S.key][i] = (S.qs[i].a + 1) % S.qs[i].en.o.length; return a;
 };
 const sql = (q) => execSync(`psql "${process.env.DATABASE_URL}" -tAc "${q}"`).toString().trim();
@@ -58,6 +63,14 @@ ok(JSON.stringify(r.json?.newBadges) === '["first_steps"]', "first finish earns 
 r = await g.req("/room/medical");
 ok(r.status !== 200, "Room 2 still locked after a critical miss");
 
+{
+  const u = new Client();
+  const res = await u.req("/api/rooms/water/complete", { method: "POST", body: { answers: withUnsafePlacement(water) } });
+  ok(res.json?.result?.passed === false && res.json.result.criticalMisses.length === 1 && res.json.result.score >= 90, "unsafe placement (bleach in kids' corner) is a critical error: high score, not passed");
+  const bad = perfect(water); bad.stages.place[0] = 99;
+  ok((await u.req("/api/rooms/water/complete", { method: "POST", body: { answers: bad } })).status === 400, "placement into a zone that doesn't exist is rejected");
+  sql("delete from \\\"Player\\\" where id = (select id from \\\"Player\\\" order by \\\"createdAt\\\" desc limit 1)"); // remove this throwaway guest
+}
 r = await g.req("/api/rooms/water/complete", { method: "POST", body: { answers: perfect(water) } });
 ok(r.json?.result?.score === 100 && r.json.result.passed, "perfect run passes");
 ok(["water_guardian", "perfect", "comeback"].every((b) => r.json?.newBadges?.includes(b)) && !r.json.newBadges.includes("first_try"), "pass after a miss: Water Guardian + Perfect + Never Give Up (not first try)");
