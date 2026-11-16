@@ -16,7 +16,7 @@ Next.js (App Router) · TypeScript · Prisma · Neon PostgreSQL · Vercel
 - [x] Bunker floor-plan map and badges
 - [x] Forgot password (bilingual email via Resend, 1-hour one-time links)
 - [x] Drag-and-drop placement (correct / incorrect / unsafe; drag, tap, or keyboard)
-- [ ] Rooms 3–6, Power Outage scenario, admin + safety review, Rooms 3–6, Power Outage scenario, admin + safety review
+- [ ] Rooms 3–6, Power Outage scenario, admin + safety review
 
 ## Develop
 ```bash
