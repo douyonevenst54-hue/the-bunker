@@ -4,6 +4,7 @@ import { getRoom } from "@/lib/rooms";
 import { scoreRoom, validateAnswers } from "@/lib/scoring";
 import { prisma, dbEnabled } from "@/lib/db";
 import { getOrCreatePlayer } from "@/lib/session";
+import { getBadgeIds } from "@/lib/progress";
 
 /** The client sends raw answers; the server scores them. The client never sets the score. */
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -22,6 +23,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   const result = scoreRoom(room, answers);
   try {
     const player = await getOrCreatePlayer();
+    const before = new Set(await getBadgeIds(player.id));
     const now = new Date();
     await prisma.$transaction(async (tx) => {
       await tx.roomAttempt.create({
@@ -50,7 +52,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         });
       }
     });
-    return NextResponse.json({ saved: true, result });
+    const newBadges = (await getBadgeIds(player.id)).filter((b) => !before.has(b));
+    return NextResponse.json({ saved: true, result, newBadges });
   } catch (e) {
     console.error("save failed", e);
     return NextResponse.json({ error: "Could not save" }, { status: 500 });

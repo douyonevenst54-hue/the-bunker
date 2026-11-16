@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Bin, Room, RoomAnswers } from "@/lib/rooms/types";
 import { scoreRoom, type RoomResult } from "@/lib/scoring";
 import { useLang } from "./LangProvider";
+import { BADGES } from "@/lib/badges";
 import type { StringKey } from "@/lib/i18n";
 
 type Screen = { kind: "intro" } | { kind: "sort"; i: number } | { kind: "stage"; s: number; i: number } | { kind: "results" };
@@ -17,6 +18,7 @@ export default function RoomGame({ room }: { room: Room }) {
   const [result, setResult] = useState<RoomResult | null>(null);
   const [save, setSave] = useState<Save>("saving");
   const [copied, setCopied] = useState(false);
+  const [newBadges, setNewBadges] = useState<string[]>([]);
   const ui = room.ui[lang];
 
   const steps = ["sort", ...room.stages.map((s) => s.key), "results"];
@@ -26,7 +28,7 @@ export default function RoomGame({ room }: { room: Room }) {
 
   function restart() {
     ans.current = { sort: [], stages: {} };
-    setResult(null); setPicked(null); setCopied(false); setScreen({ kind: "intro" });
+    setResult(null); setNewBadges([]); setPicked(null); setCopied(false); setScreen({ kind: "intro" });
   }
 
   async function finish() {
@@ -41,6 +43,7 @@ export default function RoomGame({ room }: { room: Room }) {
       if (!r.ok) throw new Error(String(r.status));
       const data = await r.json();
       setResult(data.result); // the server's score is the official one
+      setNewBadges(Array.isArray(data.newBadges) ? data.newBadges : []);
       setSave("saved");
     } catch {
       setSave("failed");
@@ -170,6 +173,14 @@ export default function RoomGame({ room }: { room: Room }) {
             </div>
           );
         })}
+        {newBadges.length > 0 && (
+          <div className="new-badges">
+            <strong>{t("newBadges")}</strong>
+            {BADGES.filter((b) => newBadges.includes(b.id)).map((b) => (
+              <div key={b.id} className="nb"><span>{b.emoji}</span>{b.name[lang]}</div>
+            ))}
+          </div>
+        )}
         <div className="status">{save === "saving" ? t("saving") : save === "saved" ? t("saved") : t("notSaved")}</div>
         {r.passed && room.next
           ? <Link className="btn" href={`/room/${room.next}`}>{t("nextRoom")} →</Link>

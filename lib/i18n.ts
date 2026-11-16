@@ -21,6 +21,8 @@ const en = {
   roomsDone: "rooms passed", best: "Best", play_: "Play", replay: "Play again", locked: "Locked", comingSoon: "Coming soon",
   statusNew: "Not started", statusPassed: "Passed", statusRetry: "Try again to unlock the next room",
   guestNote: "You're playing as a guest. Create a free account to keep your progress on any device.",
+  mapLabel: "Map of your bunker", entrance: "ENTRANCE", corridor: "CORRIDOR",
+  badges: "Badges", continueWith: "Continue", newBadges: "New badge earned!",
   // account
   account: "Account", createAccount: "Create free account", signIn: "Sign in", signOut: "Sign out",
   email: "Email", password: "Password (8+ characters)", name: "First name (optional)",
@@ -50,6 +52,8 @@ const ht: typeof en = {
   roomsDone: "chanm reyisi", best: "Pi bon", play_: "Jwe", replay: "Jwe ankò", locked: "Fèmen", comingSoon: "Ap vini byento",
   statusNew: "Poko kòmanse", statusPassed: "Reyisi", statusRetry: "Eseye ankò pou debloke pwochen chanm nan",
   guestNote: "W ap jwe kòm envite. Kreye yon kont gratis pou kenbe pwogrè w sou nenpòt aparèy.",
+  mapLabel: "Plan bunker ou", entrance: "ANTRE", corridor: "KORIDÒ",
+  badges: "Badj", continueWith: "Kontinye", newBadges: "Nouvo badj!",
   account: "Kont", createAccount: "Kreye kont gratis", signIn: "Konekte", signOut: "Dekonekte",
   email: "Imèl", password: "Modpas (8 karaktè oswa plis)", name: "Prenon (si ou vle)",
   haveAccount: "Ou gen yon kont deja?", noAccount: "Ou nouvo isit la?", signedInAs: "Konekte kòm",

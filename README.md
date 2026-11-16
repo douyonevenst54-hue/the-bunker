@@ -13,7 +13,8 @@ Next.js (App Router) · TypeScript · Prisma · Neon PostgreSQL · Vercel
 - [x] Room 2: Medical & First Aid
 - [x] Guest + registered accounts, server-scored progress, room unlocking
 - [x] Critical safety errors block unlocking (a high score can't hide them)
-- [ ] Bunker map, drag-and-drop placement, Rooms 3–6, Power Outage scenario, admin + safety review
+- [x] Bunker floor-plan map and badges
+- [ ] Forgot password, drag-and-drop placement, Rooms 3–6, Power Outage scenario, admin + safety review
 
 ## Develop
 ```bash
