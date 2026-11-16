@@ -91,7 +91,8 @@ function results(){
   <div class="card" style="margin-top:14px"><h2>📋 ${t('checklist')}</h2><p>${t('checkSub')}</p>
   <ul class="check">${R.check[L].map(x=>`<li>${x}</li>`).join('')}</ul>
   <button class="btn ghost" id="cp">${t('copy')}</button>
-  <button class="btn" id="ag">${t('again')}</button>${srcHTML()}</div>
+  ${R.next?`<a class="btn" style="text-align:center;text-decoration:none" href="${R.next.href}">${R.next[L]} →</a>`:''}
+  <button class="btn ${R.next?'ghost':''}" id="ag">${t('again')}</button>${srcHTML()}</div>
   <p class="note">${t('proto')}</p>`;
  requestAnimationFrame(()=>setTimeout(()=>app.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%'),50));
  document.getElementById('cp').onclick=async e=>{const txt=`THE BUNKER — ${t('checklist')}\n`+R.check[L].map(x=>'☐ '+x).join('\n');
