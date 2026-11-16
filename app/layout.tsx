@@ -5,6 +5,7 @@ import "./globals.css";
 import { LangProvider, LangToggle } from "@/components/LangProvider";
 import { asLang, LANG_COOKIE, STRINGS } from "@/lib/i18n";
 import { getPlayer } from "@/lib/session";
+import { isAdmin } from "@/lib/admin";
 
 export const metadata: Metadata = {
   title: "THE BUNKER — Build your bunker. Protect lives.",
@@ -28,6 +29,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <header>
               <div className="brand"><Link href="/">THE <span>BUNKER</span></Link></div>
               <div className="right">
+                {isAdmin(player) && <Link className="acct" href="/admin">{s.admin}</Link>}
                 <Link className="acct" href="/account">{player?.email ? "👤" : s.account}</Link>
                 <LangToggle />
               </div>

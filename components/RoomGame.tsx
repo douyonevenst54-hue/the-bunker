@@ -12,7 +12,7 @@ import type { StringKey } from "@/lib/i18n";
 type Screen = { kind: "intro" } | { kind: "sort"; i: number } | { kind: "stage"; s: number; i: number } | { kind: "results" };
 type Save = "saving" | "saved" | "failed";
 
-export default function RoomGame({ room }: { room: Room }) {
+export default function RoomGame({ room, reviewed }: { room: Room; reviewed?: { name: string; date: string } | null }) {
   const { lang, t } = useLang();
   const [screen, setScreen] = useState<Screen>({ kind: "intro" });
   const [picked, setPicked] = useState<string | number | null>(null);
@@ -90,6 +90,7 @@ export default function RoomGame({ room }: { room: Room }) {
         <div className="hero">{room.emoji}</div>
         <h1>{ui.title}</h1><p>{ui.intro1}</p><p>{ui.intro2}</p>
         <button className="btn" onClick={() => setScreen({ kind: "sort", i: 0 })}>{t("start")}</button>
+        {reviewed && <p className="reviewed">✅ {t("reviewedBy")} {reviewed.name} · {reviewed.date}</p>}
       </div>
       <p className="note" dangerouslySetInnerHTML={{ __html: t("proto") }} />
     </>

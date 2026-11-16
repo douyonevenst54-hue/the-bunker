@@ -1,13 +1,13 @@
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { getScenario } from "@/lib/scenarios";
+import { liveScenario } from "@/lib/content";
 import { asLang, LANG_COOKIE, STRINGS } from "@/lib/i18n";
 
 /** Expert review: every event with every choice, its outcome and explanation. */
 export default async function ScenarioReview({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const sc = getScenario(id);
+  const sc = await liveScenario(id);
   if (!sc) notFound();
   const lang = asLang((await cookies()).get(LANG_COOKIE)?.value);
   const s = STRINGS[lang];
