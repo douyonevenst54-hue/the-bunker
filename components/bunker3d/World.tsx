@@ -60,10 +60,10 @@ function Box({ p, s, c, r = 0.9 }: { p: V3; s: V3; c: string; r?: number }) {
   return <mesh position={p}><boxGeometry args={s} /><meshStandardMaterial color={c} roughness={r} /></mesh>;
 }
 
+/** HTML label pinned in 3D. Stays mounted and is hidden with CSS (unmounting drei's Html mid-frame can throw). */
 function Label({ p, children, size = 13, show = true }: { p: V3; children: React.ReactNode; size?: number; show?: boolean }) {
-  if (!show) return null;
   return (
-    <Html position={p} center distanceFactor={7} zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={p} center distanceFactor={7} zIndexRange={[20, 0]} style={{ pointerEvents: "none", display: show ? "block" : "none" }}>
       <div className="b3-label" style={{ fontSize: size }}>{children}</div>
     </Html>
   );
@@ -72,8 +72,14 @@ function Label({ p, children, size = 13, show = true }: { p: V3; children: React
 /* ----------------------------------------------------------------- camera */
 
 /** Glides to the current view; drag (mouse or finger) looks around from there. */
-export function CameraRig({ pos, look }: { pos: V3; look: V3 }) {
-  const { camera, gl } = useThree();
+export function CameraRig({ pos, look, shift = 0.17 }: { pos: V3; look: V3; shift?: number }) {
+  const { camera, gl, size } = useThree();
+  // Lift the picture so what you're looking at sits above the bottom panel.
+  useEffect(() => {
+    const cam = camera as THREE.PerspectiveCamera;
+    cam.setViewOffset(size.width, size.height, 0, size.height * shift, size.width, size.height);
+    cam.updateProjectionMatrix();
+  }, [camera, size.width, size.height, shift]);
   const off = useRef({ yaw: 0, pitch: 0 });
   const cur = useRef(new THREE.Vector3(...look));
   const key = pos.join() + look.join();
@@ -290,7 +296,7 @@ export function Room({ items, crates, glowCrates, onCrate, zones, glowZones, onZ
               <meshStandardMaterial color="#ffb02e" transparent opacity={glowZones ? 0.16 : 0} depthWrite={false} />
             </mesh>
             <Label p={[0, 2.65, 0.3]} show={showLabels}>{label}</Label>
-            {placedAt[z]?.length > 0 && <Label p={[0, 1.2, 0.5]} size={22} show={showLabels}>{placedAt[z].join(" ")}</Label>}
+            <Label p={[0, 1.2, 0.5]} size={22} show={showLabels && (placedAt[z]?.length ?? 0) > 0}>{(placedAt[z] ?? []).join(" ")}</Label>
           </group>
         );
       })}
@@ -323,7 +329,7 @@ export function Scene(props: {
       <CameraRig {...props.view} />
       <Outside {...props.outside} />
       <Corridor {...props.corridor} />
-      {props.showRoom && <Room {...props.room} />}
+      <group visible={props.showRoom}><Room {...props.room} /></group>
     </>
   );
 }

@@ -141,6 +141,8 @@ export default function Room3D({ room, otherRooms }: { room: Room; otherRooms: s
   /* ---------------------------------------------------------------- 3D props */
   const crates: CrateState[] = sorted.map((b, i) => (b === null ? "open" : b === room.items[i].b ? "right" : "wrong"));
   const placeS = S?.kind === "place" ? S : null;
+  // The room's furniture (placement spots) is always there, even before or after the placing stage.
+  const furniture = room.stages.find((x) => x.kind === "place");
   const placedAt = useMemo(() => {
     const out: string[][] = [];
     if (placeS) placed.forEach((z, i) => { if (z !== null) (out[z] ??= []).push(placeS.items[i].e); });
@@ -272,7 +274,7 @@ export default function Room3D({ room, otherRooms }: { room: Room; otherRooms: s
             corridor={{ roomDoorOpen, glow: phase === "corridor", onRoomDoor: openRoomDoor, showLabels: phase === "corridor", roomTitle: `${room.emoji} ${ui.room}`, others: otherRooms }}
             room={{
               items: room.items, crates, glowCrates: phase === "room" && step === -1 && inspect === null, onCrate: inspectCrate,
-              zones: placeS ? placeS.zones.map((z) => z.label[lang]) : [], glowZones: selItem !== null, onZone: chooseZone, placedAt,
+              zones: furniture?.kind === "place" ? furniture.zones.map((z) => z.label[lang]) : [], glowZones: selItem !== null, onZone: chooseZone, placedAt,
               terminalGlow: phase === "room" && !!S && S.kind !== "place" && !terminalOpen, onTerminal: openTerminal,
               showLabels: inRoom, terminalLabel: t("terminal"),
             }}
