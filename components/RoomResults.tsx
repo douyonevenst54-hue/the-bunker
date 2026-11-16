@@ -10,8 +10,8 @@ import type { StringKey } from "@/lib/i18n";
 export type Save = "saving" | "saved" | "failed";
 
 /** Score, critical errors, categories, new badges, checklist and sources. Shared by the 2D and 3D rooms. */
-export default function RoomResults({ room, result, save, newBadges, onRestart, progress }: {
-  room: Room; result: RoomResult; save: Save; newBadges: string[]; onRestart: () => void; progress?: React.ReactNode;
+export default function RoomResults({ room, result, save, newBadges, onRestart, progress, nextHref }: {
+  room: Room; result: RoomResult; save: Save; newBadges: string[]; onRestart: () => void; progress?: React.ReactNode; nextHref?: string;
 }) {
   const { lang, t } = useLang();
   const [copied, setCopied] = useState(false);
@@ -63,7 +63,7 @@ export default function RoomResults({ room, result, save, newBadges, onRestart, 
         )}
         <div className="status">{save === "saving" ? t("saving") : save === "saved" ? t("saved") : t("notSaved")}</div>
         {r.passed && room.next
-          ? <Link className="btn" href={`/room/${room.next}`}>{t("nextRoom")} →</Link>
+          ? <Link className="btn" href={nextHref ?? `/room/${room.next}`}>{t("nextRoom")} →</Link>
           : !r.passed && <p className="status">{t("unlockHint")}</p>}
         <button className={`btn ${r.passed && room.next ? "ghost" : ""}`} onClick={onRestart}>{t("again")}</button>
         <Link className="btn ghost" href="/">{t("backToBunker")}</Link>

@@ -31,6 +31,19 @@ export const SLOTS: { at: V3; view: { pos: V3; look: V3 }; kind: string }[] = [
   { at: [6.4, 0, -3.45], view: { pos: [6.4, 1.7, -6.6], look: [6.4, 0.7, -3.5] }, kind: "counter" },
 ];
 
+/** Which piece of furniture to draw for a placement spot, by the spot's id. */
+const ZONE_KIND: Record<string, string> = {
+  shelf: "shelf", high: "high", kitchen: "counter", window: "window", fuel: "hazard", kids: "kids",
+  closet: "closet", highcab: "high", bath: "bath", fridge: "fridge", attic: "attic", table: "table",
+};
+
+export type Theme = { wall: string; floor: string; ceil: string; door: string; pallet: string; light: string; decor: "water" | "medical" | "none" };
+export const THEMES: Record<string, Theme> = {
+  water: { wall: "#606870", floor: "#40464c", ceil: "#4a5056", door: "#2f6f9f", pallet: "#8b6a45", light: "#ffeccc", decor: "water" },
+  medical: { wall: "#c9d3d6", floor: "#7f8c8f", ceil: "#dfe6e8", door: "#b8322c", pallet: "#e7ecef", light: "#f2fbff", decor: "medical" },
+};
+export const themeFor = (id: string): Theme => THEMES[id] ?? { ...THEMES.water, decor: "none" };
+
 export function crateSpot(i: number): V3 {
   const col = i % 4, row = Math.floor(i / 4);
   return [6.3 + col * 0.72, 0.25, -8.6 + row * 0.72];
@@ -163,8 +176,8 @@ function Outside({ doorOpen, glow, onDoor, showLabels, title }: { doorOpen: bool
 
 /* --------------------------------------------------------------- corridor */
 
-function Corridor({ roomDoorOpen, glow, onRoomDoor, showLabels, roomTitle, others }: {
-  roomDoorOpen: boolean; glow: boolean; onRoomDoor: () => void; showLabels: boolean; roomTitle: string; others: string[];
+function Corridor({ roomDoorOpen, glow, onRoomDoor, showLabels, roomTitle, others, doorColor }: {
+  roomDoorOpen: boolean; glow: boolean; onRoomDoor: () => void; showLabels: boolean; roomTitle: string; others: string[]; doorColor: string;
 }) {
   const wall = "#5d6166", floor = "#3b3f44";
   const lights = [-2, -6, -10];
@@ -190,12 +203,12 @@ function Corridor({ roomDoorOpen, glow, onRoomDoor, showLabels, roomTitle, other
       {fake.map(([x, z], i) => (
         <group key={i}>
           <Box p={[x > 0 ? x - 0.07 : x + 0.07, 1.25, z]} s={[0.06, 2.5, 1.2]} c="#4a5560" />
-          <Label p={[x > 0 ? x - 0.15 : x + 0.15, 2.7, z]} show={showLabels}>🔒 {others[i] ?? ""}</Label>
+          <Label p={[x > 0 ? x - 0.15 : x + 0.15, 2.7, z]} show={showLabels}>{others[i] ?? ""}</Label>
         </group>
       ))}
       {/* this room's door */}
       <group rotation={[0, -Math.PI / 2, 0]} position={[1.5, 0, -6.8]}>
-        <Door hinge={[0, 0, 0]} width={1.4} open={roomDoorOpen} glow={glow} onTap={onRoomDoor} color="#2f6f9f" />
+        <Door hinge={[0, 0, 0]} width={1.4} open={roomDoorOpen} glow={glow} onTap={onRoomDoor} color={doorColor} />
       </group>
       <Label p={[1.4, 2.75, -7.5]} size={15} show={showLabels}>{roomTitle}</Label>
     </group>
@@ -238,6 +251,44 @@ function StationModel({ kind }: { kind: string }) {
         <mesh position={[-0.3, 0.12, 0.4]}><sphereGeometry args={[0.12, 12, 12]} /><meshStandardMaterial color="#e2504a" /></mesh>
         <Box p={[0.3, 0.1, 0.5]} s={[0.2, 0.2, 0.2]} c="#f1c232" />
       </group>);
+    case "closet":
+      return (<group>
+        <Box p={[0, 1.1, 0]} s={[1.5, 2.2, 0.55]} c="#8c7a64" />
+        <Box p={[-0.37, 1.1, 0.29]} s={[0.7, 2.0, 0.02]} c="#a08c72" />
+        <Box p={[0.37, 1.1, 0.29]} s={[0.7, 2.0, 0.02]} c="#a08c72" />
+        <Box p={[0.06, 1.1, 0.32]} s={[0.04, 0.25, 0.04]} c="#d8d8d8" />
+      </group>);
+    case "bath":
+      return (<group>
+        <Box p={[0, 0.42, 0.1]} s={[1.2, 0.84, 0.5]} c="#e9eef0" />
+        <mesh position={[0, 0.86, 0.1]}><cylinderGeometry args={[0.3, 0.26, 0.08, 20]} /><meshStandardMaterial color="#cfe3ea" /></mesh>
+        <Box p={[0, 1.75, 0.05]} s={[0.9, 0.7, 0.18]} c="#dfe7ea" />
+        <mesh position={[0, 1.75, 0.15]}><planeGeometry args={[0.8, 0.6]} /><meshStandardMaterial color="#9fc4d4" metalness={0.6} roughness={0.15} /></mesh>
+        {[[-0.3, 2.35], [0.05, 2.5], [0.35, 2.3]].map(([x, y], i) => (
+          <mesh key={i} position={[x, y, 0.3]}><sphereGeometry args={[0.16, 10, 10]} /><meshStandardMaterial color="#ffffff" transparent opacity={0.35} /></mesh>
+        ))}
+      </group>);
+    case "fridge":
+      return (<group>
+        <Box p={[0, 0.95, 0]} s={[0.9, 1.9, 0.7]} c="#eef1f2" r={0.4} />
+        <Box p={[0.35, 1.2, 0.36]} s={[0.04, 0.5, 0.04]} c="#9aa3a8" />
+        <Box p={[-0.15, 1.45, 0.36]} s={[0.3, 0.4, 0.01]} c="#ffe9a8" />
+        <Box p={[0.75, 1.3, -0.25]} s={[0.25, 0.4, 0.08]} c="#2c2f33" />
+      </group>);
+    case "attic":
+      return (<group>
+        <Box p={[0, 2.93, 0.5]} s={[1.0, 0.06, 0.8]} c="#6a5640" />
+        {[-0.25, 0.25].map((x) => <Box key={x} p={[x, 1.45, 0.75]} s={[0.05, 2.9, 0.05]} c="#8a7350" />)}
+        {[0.4, 0.9, 1.4, 1.9, 2.4].map((y) => <Box key={y} p={[0, y, 0.75]} s={[0.5, 0.04, 0.05]} c="#8a7350" />)}
+        <Box p={[0, 2.75, 0.92]} s={[0.18, 0.18, 0.08]} c="#c9a227" />
+      </group>);
+    case "table":
+      return (<group>
+        <Box p={[0, 0.5, 0.35]} s={[1.3, 0.06, 0.8]} c="#b07a48" />
+        {[[-0.55, 0.05], [0.55, 0.05], [-0.55, 0.65], [0.55, 0.65]].map(([x, z], i) => <Box key={i} p={[x, 0.25, z]} s={[0.06, 0.5, 0.06]} c="#8b5e36" />)}
+        <mesh position={[-0.3, 0.6, 0.35]}><sphereGeometry args={[0.09, 12, 12]} /><meshStandardMaterial color="#e2504a" /></mesh>
+        <Box p={[0.25, 0.6, 0.4]} s={[0.15, 0.15, 0.15]} c="#4f9be0" />
+      </group>);
     default:
       return <Box p={[0, 0.5, 0]} s={[1, 1, 0.5]} c="#777" />;
   }
@@ -245,31 +296,45 @@ function StationModel({ kind }: { kind: string }) {
 
 export type CrateState = "open" | "right" | "wrong";
 
-function RoomShell() {
-  const wall = "#606870";
+function RoomShell({ th }: { th: Theme }) {
   return (
     <group>
-      <Box p={[6, 0, -7.5]} s={[9, 0.1, 9]} c="#40464c" />
-      <Box p={[6, 3, -7.5]} s={[9, 0.1, 9]} c="#4a5056" />
-      <Box p={[6, 1.5, -12.05]} s={[9, 3, 0.1]} c={wall} />
-      <Box p={[6, 1.5, -2.95]} s={[9, 3, 0.1]} c={wall} />
-      <Box p={[10.55, 1.5, -7.5]} s={[0.1, 3, 9]} c={wall} />
-      <pointLight position={[6, 2.7, -7.5]} intensity={14} distance={12} color="#ffeccc" />
+      <Box p={[6, 0, -7.5]} s={[9, 0.1, 9]} c={th.floor} />
+      <Box p={[6, 3, -7.5]} s={[9, 0.1, 9]} c={th.ceil} />
+      <Box p={[6, 1.5, -12.05]} s={[9, 3, 0.1]} c={th.wall} />
+      <Box p={[6, 1.5, -2.95]} s={[9, 3, 0.1]} c={th.wall} />
+      <Box p={[10.55, 1.5, -7.5]} s={[0.1, 3, 9]} c={th.wall} />
+      <pointLight position={[6, 2.7, -7.5]} intensity={14} distance={12} color={th.light} />
       <pointLight position={[3.5, 2.6, -10]} intensity={4} distance={6} color="#bfe6ff" />
+      {th.decor === "medical" && (
+        <group>
+          {/* red cross on the back wall and a wall stripe */}
+          <Box p={[5.1, 2.35, -11.98]} s={[0.7, 0.22, 0.02]} c="#c62f2a" />
+          <Box p={[5.1, 2.35, -11.98]} s={[0.22, 0.7, 0.02]} c="#c62f2a" />
+          <Box p={[6, 1.0, -11.99]} s={[9, 0.08, 0.01]} c="#3aa6a0" />
+          <Box p={[10.49, 1.0, -7.5]} s={[0.01, 0.08, 9]} c="#3aa6a0" />
+        </group>
+      )}
+      {th.decor === "water" && (
+        <group>
+          <mesh position={[5.1, 2.35, -11.98]}><circleGeometry args={[0.32, 24]} /><meshStandardMaterial color="#3d8fd1" /></mesh>
+          <Box p={[6, 1.0, -11.99]} s={[9, 0.08, 0.01]} c="#3d8fd1" />
+        </group>
+      )}
     </group>
   );
 }
 
-export function Room({ items, crates, glowCrates, onCrate, zones, glowZones, onZone, placedAt, terminalGlow, onTerminal, showLabels, terminalLabel }: {
-  items: { e: string }[]; crates: CrateState[]; glowCrates: boolean; onCrate: (i: number) => void;
-  zones: string[]; glowZones: boolean; onZone: (z: number) => void; placedAt: string[][];
+export function Room({ theme, items, crates, glowCrates, onCrate, zones, zoneIds, glowZones, onZone, placedAt, terminalGlow, onTerminal, showLabels, terminalLabel }: {
+  theme: Theme; items: { e: string }[]; crates: CrateState[]; glowCrates: boolean; onCrate: (i: number) => void;
+  zones: string[]; zoneIds: string[]; glowZones: boolean; onZone: (z: number) => void; placedAt: string[][];
   terminalGlow: boolean; onTerminal: () => void; showLabels: boolean; terminalLabel: string;
 }) {
   return (
     <group>
-      <RoomShell />
+      <RoomShell th={theme} />
       {/* supply pallet */}
-      <Box p={[7.4, 0.06, -7.5]} s={[3.2, 0.12, 3.2]} c="#8b6a45" />
+      <Box p={[7.4, 0.06, -7.5]} s={[3.2, 0.12, 3.2]} c={theme.pallet} />
       {items.map((it, i) => {
         const p = crateSpot(i);
         const st = crates[i];
@@ -290,7 +355,7 @@ export function Room({ items, crates, glowCrates, onCrate, zones, glowZones, onZ
         const facing = slot.at[0] > 10 ? -Math.PI / 2 : slot.at[2] > -4 ? Math.PI : 0;
         return (
           <group key={z} position={slot.at} rotation={[0, facing, 0]}>
-            <StationModel kind={slot.kind} />
+            <StationModel kind={ZONE_KIND[zoneIds[z]] ?? slot.kind} />
             <mesh position={[0, 1.1, 0.35]} onClick={tap(() => onZone(z))} {...hover}>
               <boxGeometry args={[1.8, 2.2, 0.05]} />
               <meshStandardMaterial color="#ffb02e" transparent opacity={glowZones ? 0.16 : 0} depthWrite={false} />

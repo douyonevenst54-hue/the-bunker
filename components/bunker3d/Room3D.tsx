@@ -7,7 +7,8 @@ import { judgePlacement, scoreRoom, type Placement, type RoomResult } from "@/li
 import { optionOrder } from "@/lib/shuffle";
 import { useLang } from "../LangProvider";
 import RoomResults, { type Save } from "../RoomResults";
-import { Scene, VIEWS, SLOTS, crateSpot, type V3, type CrateState } from "./World";
+import { Scene, VIEWS, SLOTS, crateSpot, themeFor, type V3, type CrateState } from "./World";
+import { ROOMS_3D } from "@/lib/rooms/three-d";
 
 type Phase = "brief" | "outside" | "corridor" | "room" | "results";
 type View = { pos: V3; look: V3 };
@@ -20,6 +21,7 @@ type View = { pos: V3; look: V3 };
 export default function Room3D({ room, otherRooms }: { room: Room; otherRooms: string[] }) {
   const { lang, t } = useLang();
   const ui = room.ui[lang];
+  const theme = themeFor(room.id);
   const [phase, setPhase] = useState<Phase>("brief");
   const [view, setView] = useState<View>(VIEWS.outside);
   const [doorOpen, setDoorOpen] = useState(false);
@@ -85,9 +87,9 @@ export default function Room3D({ room, otherRooms }: { room: Room; otherRooms: s
   function beginStage(s: number) {
     if (s >= room.stages.length) { finish(); return; }
     const st = room.stages[s];
-    setStep(s); setQi(0); setPicked(null); setTerminalOpen(false); setSelItem(null); setPlaceFb(null);
+    // stay at the terminal when one question stage follows another
+    setStep(s); setQi(0); setPicked(null); setTerminalOpen((open) => open && st.kind !== "place"); setSelItem(null); setPlaceFb(null);
     if (st.kind === "place") { setPlaced(st.items.map(() => null)); setView(VIEWS.room); }
-    else setView(VIEWS.room);
   }
 
   function chooseZone(z: number) {
@@ -271,10 +273,11 @@ export default function Room3D({ room, otherRooms }: { room: Room; otherRooms: s
             view={view}
             showRoom={phase === "corridor" || inRoom}
             outside={{ doorOpen, glow: phase === "outside", onDoor: openMainDoor, showLabels: phase === "outside" || phase === "brief", title: "THE BUNKER" }}
-            corridor={{ roomDoorOpen, glow: phase === "corridor", onRoomDoor: openRoomDoor, showLabels: phase === "corridor", roomTitle: `${room.emoji} ${ui.room}`, others: otherRooms }}
+            corridor={{ roomDoorOpen, glow: phase === "corridor", onRoomDoor: openRoomDoor, showLabels: phase === "corridor", roomTitle: `${room.emoji} ${ui.room}`, others: otherRooms, doorColor: theme.door }}
             room={{
-              items: room.items, crates, glowCrates: phase === "room" && step === -1 && inspect === null, onCrate: inspectCrate,
-              zones: furniture?.kind === "place" ? furniture.zones.map((z) => z.label[lang]) : [], glowZones: selItem !== null, onZone: chooseZone, placedAt,
+              theme, items: room.items, crates, glowCrates: phase === "room" && step === -1 && inspect === null, onCrate: inspectCrate,
+              zones: furniture?.kind === "place" ? furniture.zones.map((z) => z.label[lang]) : [],
+              zoneIds: furniture?.kind === "place" ? furniture.zones.map((z) => z.id) : [], glowZones: selItem !== null, onZone: chooseZone, placedAt,
               terminalGlow: phase === "room" && !!S && S.kind !== "place" && !terminalOpen, onTerminal: openTerminal,
               showLabels: inRoom, terminalLabel: t("terminal"),
             }}
@@ -288,7 +291,8 @@ export default function Room3D({ room, otherRooms }: { room: Room; otherRooms: s
       </div>
       {phase === "results" && result ? (
         <div className="b3-results">
-          <RoomResults room={room} result={result} save={save} newBadges={newBadges} onRestart={restart} />
+          <RoomResults room={room} result={result} save={save} newBadges={newBadges} onRestart={restart}
+            nextHref={room.next && ROOMS_3D.includes(room.next) ? `/room/${room.next}/3d` : undefined} />
         </div>
       ) : panel}
     </div>
