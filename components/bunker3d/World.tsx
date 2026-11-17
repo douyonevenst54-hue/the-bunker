@@ -4,6 +4,7 @@ import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import Icon from "../Icon";
+import { LAYOUTS, ItemModel, Table } from "./Props";
 
 export type V3 = [number, number, number];
 
@@ -334,8 +335,7 @@ function StationModel({ kind }: { kind: string }) {
     case "backdoor":
       return (<group>
         <Box p={[0, 1.15, 0]} s={[1.0, 2.3, 0.08]} c="#6b5a45" />
-        <Box p={[-0.15, 0.25, 0.45]} s={[0.55, 0.5, 0.5]} c="#b88a55" />
-        <Box p={[0.2, 0.7, 0.45]} s={[0.5, 0.4, 0.45]} c="#c79b63" />
+        <Box p={[0.38, 1.15, 0.06]} s={[0.06, 0.06, 0.06]} c="#d8d8d8" />
       </group>);
     case "upwindow":
       return (<group>
@@ -429,6 +429,17 @@ function StationModel({ kind }: { kind: string }) {
 
 export type CrateState = "open" | "right" | "wrong";
 
+const HALO: Record<string, number> = { boxes: 0.75, ladder: 0.6, extinguisher: 0.45, wreath: 0.35 };
+
+/** Soft pulsing glow around something you can still inspect; brighter when it's the one in front of you. */
+function Halo({ r, on, strong }: { r: number; on: boolean; strong: boolean }) {
+  const ref = useRef<THREE.MeshBasicMaterial>(null);
+  useFrame(({ clock }) => {
+    if (ref.current) ref.current.opacity = !on ? 0 : (strong ? 0.28 : 0.1) + (strong ? 0.12 : 0.06) * Math.sin(clock.elapsedTime * 4);
+  });
+  return <mesh><sphereGeometry args={[r, 20, 14]} /><meshBasicMaterial ref={ref} color="#ffb02e" transparent opacity={0} depthWrite={false} /></mesh>;
+}
+
 function RoomShell({ th }: { th: Theme }) {
   return (
     <group>
@@ -483,14 +494,33 @@ function RoomShell({ th }: { th: Theme }) {
   );
 }
 
-export function Room({ theme, items, crates, glowCrates, onCrate, zones, zoneIds, glowZones, onZone, placedAt, terminalGlow, onTerminal, showLabels, terminalLabel }: {
+export function Room({ roomId, focusId, theme, items, crates, glowCrates, onCrate, zones, zoneIds, glowZones, onZone, placedAt, terminalGlow, onTerminal, showLabels, terminalLabel }: {
+  roomId: string; focusId: string | null;
   theme: Theme; items: { e: string }[]; crates: CrateState[]; glowCrates: boolean; onCrate: (i: number) => void;
   zones: string[]; zoneIds: string[]; glowZones: boolean; onZone: (z: number) => void; placedAt: string[][];
   terminalGlow: boolean; onTerminal: () => void; showLabels: boolean; terminalLabel: string;
 }) {
+  const layout = LAYOUTS[roomId];
   return (
     <group>
       <RoomShell th={theme} />
+      {layout ? (<>
+        {layout.table && <Table at={layout.table} />}
+        {items.map((it, i) => {
+          const pl = layout.items[i];
+          if (!pl) return null;
+          const st = crates[i];
+          return (
+            <group key={i} position={pl.at} rotation={[0, pl.rotY ?? 0, 0]}>
+              <group onClick={tap(() => onCrate(i))} {...hover}><ItemModel kind={pl.model} /></group>
+              <group position={[0, pl.at[1] > 2.5 ? -0.05 : 0.15, 0]}>
+                <Halo r={HALO[pl.model] ?? 0.28} on={glowCrates && st === "open"} strong={focusId === `item:${i}`} />
+              </group>
+              <Label p={[0, pl.at[1] > 2.5 ? -0.3 : 0.55, 0]} size={18} show={showLabels && st !== "open"}>{st === "right" ? "✅" : "❌"}</Label>
+            </group>
+          );
+        })}
+      </>) : (<>
       {/* supply pallet */}
       <Box p={[7.4, 0.06, -7.5]} s={[3.2, 0.12, 3.2]} c={theme.pallet} />
       {items.map((it, i) => {
@@ -507,6 +537,7 @@ export function Room({ theme, items, crates, glowCrates, onCrate, zones, zoneIds
           </group>
         );
       })}
+      </>)}
       {/* placement stations */}
       {zones.map((label, z) => {
         const slot = SLOTS[z] ?? SLOTS[0];
@@ -537,7 +568,7 @@ export function Room({ theme, items, crates, glowCrates, onCrate, zones, zoneIds
 }
 
 export function Scene(props: {
-  view: { pos: V3; look: V3 };
+  walker: React.ReactNode;
   outside: React.ComponentProps<typeof Outside>;
   corridor: React.ComponentProps<typeof Corridor>;
   room: React.ComponentProps<typeof Room>;
@@ -547,9 +578,9 @@ export function Scene(props: {
     <>
       <color attach="background" args={["#141a24"]} />
       <fog attach="fog" args={["#141a24", 14, 40]} />
-      <hemisphereLight args={["#b9c8ff", "#2b2a24", 0.9]} />
+      <hemisphereLight args={["#c4d0ff", "#3a382f", 1.15]} />
       <directionalLight position={[6, 10, 8]} intensity={1.1} />
-      <CameraRig {...props.view} />
+      {props.walker}
       <Outside {...props.outside} />
       <Corridor {...props.corridor} />
       <group visible={props.showRoom}><Room {...props.room} /></group>
