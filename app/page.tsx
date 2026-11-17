@@ -6,6 +6,7 @@ import { getPlayer } from "@/lib/session";
 import { getRoomStatuses, getBadgeIds, getLevels } from "@/lib/progress";
 import { SCENARIOS } from "@/lib/scenarios";
 import BunkerMap from "@/components/BunkerMap";
+import ShareButton from "@/components/ShareButton";
 import { needsPlan, paywallOn, isMember } from "@/lib/plan";
 import BadgeShelf from "@/components/BadgeShelf";
 
@@ -36,6 +37,9 @@ export default async function Bunker() {
         <div className="meter"><div style={{ width: `${(passed / total) * 100}%` }} /></div>
         <div className="count" style={{ marginTop: 6 }}>{passed} / {total} {s.roomsDone}</div>
         {nextRoom && <Link className="btn" href={`/room/${nextRoom.id}`}>{nextRoom.emoji} {s.continueWith}: {nextRoom.ui[lang].room.replace(/^[^·]*·\s*/, "")}</Link>}
+        {(passed > 0 || badges.length > 0) && (
+          <ShareButton ghost text={s.shareProgressText.replace("{rooms}", String(passed)).replace("{badges}", String(badges.length))} />
+        )}
       </div>
 
       <div className="card map-card">

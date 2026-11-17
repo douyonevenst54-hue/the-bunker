@@ -192,6 +192,23 @@ ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merg
   ok(fl.json?.result?.passed === false && fl.json.result.criticalMisses.length === 1, "flood: an unsafe choice blocks passing");
   fl = await p6.req("/api/scenarios/flood/complete", { method: "POST", body: { answers: floodBest } });
   ok(fl.json?.result?.score === 100 && fl.json.result.passed && fl.json.newBadges.includes("flood_survivor"), "flood: best choices pass and earn Flood Survivor");
+  // Sharing: public progress page with first name only, link preview image, and turning it off
+  ok((await p6.req("/")).text.includes("Share my bunker"), "dashboard shows the share button");
+  const sh = await p6.req("/api/share", { method: "POST" });
+  const shareUrl = sh.json?.url ?? "";
+  ok(sh.status === 200 && /\/p\/[A-Za-z0-9_-]{8}$/.test(shareUrl), "share link created");
+  ok((await p6.req("/api/share", { method: "POST" })).json?.url === shareUrl, "share link stays the same");
+  const sharePath = new URL(shareUrl).pathname;
+  const pub = await new Client().req(sharePath);
+  ok(pub.status === 200 && pub.text.includes("6/6") && pub.text.includes("Bunker Commander") && !pub.text.includes("member@example.com"),
+    "public page shows rooms and badges, never the email");
+  ok(pub.text.includes("og:image"), "public page has a link-preview image");
+  const og = await fetch(BASE + sharePath + "/opengraph-image");
+  ok(og.status === 200 && (og.headers.get("content-type") || "").includes("image/png"), "link-preview image renders");
+  ok((await p6.req("/account")).text.includes("Stop sharing my page"), "account page offers 'Stop sharing'");
+  await p6.req("/api/share", { method: "DELETE" });
+  ok((await new Client().req(sharePath)).status === 404, "after 'Stop sharing' the old link no longer works");
+  ok((await new Client().req("/p/notarealcode")).status === 404, "unknown share codes are 404");
   // Membership updates and cancellation
   ok(await stripeEvent("customer.subscription.updated", { id: "sub_1", object: "subscription", customer: "cus_member", status: "active", metadata: {}, items: { data: [{ price: { recurring: { interval: "year" } }, current_period_end: 1893456000 }] } }) === 200
     && sql(`select \\\"subInterval\\\" from \\\"Player\\\" where \\\"stripeCustomerId\\\"='cus_member'`) === "year", "webhook: subscription update stores the yearly plan");

@@ -236,3 +236,21 @@ h3{font-family:Oswald,sans-serif;font-size:18px;margin-bottom:6px}
 
 /* step 12: drawn item icons */
 .icon-img{width:1em;height:1em;vertical-align:-0.12em;display:inline-block}
+
+/* step 13: sharing */
+.share{margin-top:10px}
+.share-btn{background:linear-gradient(90deg,#25d366,#1fa855);color:#06210f}
+.share-pop{margin-top:10px;background:#141a21;border:1px solid var(--line);border-radius:12px;padding:10px}
+.share-pop input{width:100%;background:#0d1116;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:8px;font:13px Inter}
+.share-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.share-row .btn{margin:0;text-align:center}
+.shared h2{margin-top:18px}
+.shared-rooms{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.shared-rooms .sr{background:#171c1f;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:14px;opacity:.55}
+.shared-rooms .sr.on{opacity:1;border-color:#3f8f4e}
+.shared-levels{list-style:none;padding:0;margin:8px 0}
+.shared-levels li{padding:6px 0;border-bottom:1px solid var(--line);opacity:.6}
+.shared-levels li.on{opacity:1}
+.shared-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.shared-badges .nb{background:#171c1f;border:1px solid var(--line);border-radius:12px;padding:6px 10px;font-weight:600;font-size:14px}
+.shared-badges .nb span{font-size:20px;margin-right:6px;vertical-align:-3px}
