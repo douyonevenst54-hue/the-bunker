@@ -111,3 +111,12 @@ model ContentSignoff {
 
   @@index([contentId, createdAt])
 }
+
+/// Failed sign-ins, to slow down password guessing. Old rows can be deleted any time.
+model AuthAttempt {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}

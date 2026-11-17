@@ -11,6 +11,7 @@ export async function POST(req: Request) {
   const check = checkCredentials(body);
   if ("error" in check) return NextResponse.json(check, { status: 400 });
   const { email, password } = check;
+  if (body.age13 !== true) return NextResponse.json({ error: "errAge" }, { status: 400 });
   const displayName = typeof body.name === "string" ? body.name.trim().slice(0, 40) || null : null;
 
   if (await prisma.player.findUnique({ where: { email } })) {

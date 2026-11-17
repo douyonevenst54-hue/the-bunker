@@ -102,14 +102,15 @@ ok(sql(`select attempts||','||\\\"bestScore\\\"||','||passed from \\\"RoomProgre
 // Register upgrades the guest in place
 r = await g.req("/api/auth/register", { method: "POST", body: { email: "Test@Example.com", password: "short" } });
 ok(r.status === 400 && r.json?.error === "errPassword", "short password rejected");
-r = await g.req("/api/auth/register", { method: "POST", body: { email: "Test@Example.com", password: "longenough1", name: "Jhon" } });
+ok((await new Client().req("/api/auth/register", { method: "POST", body: { email: "kid@example.com", password: "longenough1" } })).json?.error === "errAge", "register requires the 13+ / parent confirmation");
+r = await g.req("/api/auth/register", { method: "POST", body: { email: "Test@Example.com", password: "longenough1", name: "Jhon", age13: true } });
 ok(r.status === 200, "register works");
 ok(sql(`select email from \\\"Player\\\" where id='${guestId}'`) === "test@example.com", "guest became the account (progress kept, email normalized)");
 r = await g.req("/account");
 ok(r.text.includes("test@example.com"), "account page shows signed-in email");
 
 const other = new Client();
-r = await other.req("/api/auth/register", { method: "POST", body: { email: "test@example.com", password: "longenough1" } });
+r = await other.req("/api/auth/register", { method: "POST", body: { email: "test@example.com", password: "longenough1", age13: true } });
 ok(r.status === 409, "duplicate email rejected");
 r = await other.req("/api/auth/login", { method: "POST", body: { email: "test@example.com", password: "wrongpass1" } });
 ok(r.status === 401, "wrong password rejected");
@@ -119,7 +120,7 @@ const g2 = new Client();
 const medical = ROOMS.find((x) => x.id === "medical");
 r = await g2.req("/api/rooms/medical/complete", { method: "POST", body: { answers: perfect(medical) } });
 ok(r.json?.saved && r.json.newBadges.includes("first_try"), "second guest saves a Room 2 result and earns 'Ready on Day One'");
-r = await g2.req("/api/auth/login", { method: "POST", body: { email: "test@example.com", password: "longenough1" } });
+r = await g2.req("/api/auth/login", { method: "POST", body: { email: "test@example.com", password: "longenough1", age13: true } });
 ok(r.status === 200, "login works");
 ok(sql(`select count(*) from \\\"RoomProgress\\\" where \\\"playerId\\\"='${guestId}'`) === "2", "guest progress merged into account on login");
 ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merged guest record removed");
@@ -128,7 +129,7 @@ ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merg
 {
   const p6 = new Client();
   // Paywall: a free account can play rooms 1–2 only
-  await p6.req("/api/auth/register", { method: "POST", body: { email: "member@example.com", password: "longenough1" } });
+  await p6.req("/api/auth/register", { method: "POST", body: { email: "member@example.com", password: "longenough1", age13: true } });
   for (const room of ROOMS.slice(0, 2)) await p6.req(`/api/rooms/${room.id}/complete`, { method: "POST", body: { answers: perfect(room) } });
   r = await p6.req("/room/security");
   ok(r.status !== 200 && r.location?.includes("/upgrade"), "paywall: Room 3 sends a free account to /upgrade");
@@ -209,6 +210,20 @@ ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merg
   await p6.req("/api/share", { method: "DELETE" });
   ok((await new Client().req(sharePath)).status === 404, "after 'Stop sharing' the old link no longer works");
   ok((await new Client().req("/p/notarealcode")).status === 404, "unknown share codes are 404");
+  // Launch polish: legal pages, SEO files, security headers, 404, sign-in rate limit
+  for (const path of ["/privacy", "/terms", "/robots.txt", "/sitemap.xml", "/manifest.webmanifest", "/opengraph-image"]) {
+    ok((await fetch(BASE + path)).status === 200, `${path} is served`);
+  }
+  const hp = await fetch(BASE + "/");
+  ok(hp.headers.get("x-frame-options") === "DENY" && hp.headers.get("x-content-type-options") === "nosniff", "security headers are set");
+  ok((await hp.text()).includes('href="/privacy"'), "footer links to the privacy policy");
+  const nf = await new Client().req("/no-such-page");
+  ok(nf.status === 404 && nf.text.includes("bunker"), "friendly 404 page");
+  const guesser = new Client();
+  let last = 0;
+  for (let i = 0; i < 9; i++) last = (await guesser.req("/api/auth/login", { method: "POST", body: { email: "member@example.com", password: "wrongpass" + i } })).status;
+  ok(last === 429, "password guessing is blocked after 8 failures (429)");
+  ok((await guesser.req("/api/auth/login", { method: "POST", body: { email: "member@example.com", password: "longenough1" } })).status === 429, "even the right password waits during the lockout");
   // Membership updates and cancellation
   ok(await stripeEvent("customer.subscription.updated", { id: "sub_1", object: "subscription", customer: "cus_member", status: "active", metadata: {}, items: { data: [{ price: { recurring: { interval: "year" } }, current_period_end: 1893456000 }] } }) === 200
     && sql(`select \\\"subInterval\\\" from \\\"Player\\\" where \\\"stripeCustomerId\\\"='cus_member'`) === "year", "webhook: subscription update stores the yearly plan");
@@ -222,7 +237,7 @@ ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merg
 {
   const adm = new Client();
   const viewer = new Client(); // Room 1 is open to anyone
-  await adm.req("/api/auth/register", { method: "POST", body: { email: "admin@example.com", password: "adminpass1", name: "Dr. Test" } });
+  await adm.req("/api/auth/register", { method: "POST", body: { email: "admin@example.com", password: "adminpass1", name: "Dr. Test", age13: true } });
   ok((await adm.req("/admin")).status === 200, "admin dashboard loads for an ADMIN_EMAILS account");
   ok((await new Client().req("/admin")).status === 404, "admin dashboard hidden from guests");
   ok((await g.req("/admin")).status === 404, "admin dashboard hidden from regular players");
@@ -274,7 +289,7 @@ r = await anon.req("/api/auth/reset", { method: "POST", body: { token: tok, pass
 ok(r.status === 200 && anon.cookies.has("bunker_session"), "reset works and signs the player in");
 r = await anon.req("/api/auth/reset", { method: "POST", body: { token: tok, password: "another1234" } });
 ok(r.status === 400, "reset link can't be used twice");
-r = await new Client().req("/api/auth/login", { method: "POST", body: { email: "test@example.com", password: "longenough1" } });
+r = await new Client().req("/api/auth/login", { method: "POST", body: { email: "test@example.com", password: "longenough1", age13: true } });
 ok(r.status === 401, "old password no longer works");
 r = await new Client().req("/api/auth/login", { method: "POST", body: { email: "test@example.com", password: "brandnew123" } });
 ok(r.status === 200, "new password works");
