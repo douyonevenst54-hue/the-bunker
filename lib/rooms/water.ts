@@ -25,7 +25,7 @@ export const waterRoom: Room = {
  },
  "items": [
   {
-   "e": "💧",
+   "e": "/icons/water-bottle.svg",
    "b": "u",
    "en": [
     "Sealed store-bought bottled water",
@@ -37,7 +37,7 @@ export const waterRoom: Room = {
    ]
   },
   {
-   "e": "🛢️",
+   "e": "/icons/water-jug.svg",
    "b": "u",
    "en": [
     "Food-grade 5-gallon water jugs",
@@ -49,7 +49,7 @@ export const waterRoom: Room = {
    ]
   },
   {
-   "e": "🥛",
+   "e": "/icons/milk-jug.svg",
    "b": "a",
    "en": [
     "Old milk jugs",
@@ -61,7 +61,7 @@ export const waterRoom: Room = {
    ]
   },
   {
-   "e": "🥤",
+   "e": "/icons/soda-bottle.svg",
    "b": "u",
    "en": [
     "Clean 2-liter soda bottles",
@@ -111,7 +111,7 @@ export const waterRoom: Room = {
    "critical": true
   },
   {
-   "e": "💉",
+   "e": "/icons/dropper.svg",
    "b": "u",
    "en": [
     "Eyedropper",
@@ -135,7 +135,7 @@ export const waterRoom: Room = {
    ]
   },
   {
-   "e": "🧻",
+   "e": "/icons/filter.svg",
    "b": "u",
    "en": [
     "Clean cloths or coffee filters",
@@ -255,7 +255,7 @@ export const waterRoom: Room = {
    "items": [
     {
      "id": "jugs",
-     "e": "🛢️",
+     "e": "/icons/water-jug.svg",
      "name": {
       "en": "Water jugs",
       "ht": "Galon dlo"
@@ -332,7 +332,7 @@ export const waterRoom: Room = {
     },
     {
      "id": "filters",
-     "e": "🧻",
+     "e": "/icons/filter.svg",
      "name": {
       "en": "Clean cloths & coffee filters",
       "ht": "Twal pwòp ak filt kafe"

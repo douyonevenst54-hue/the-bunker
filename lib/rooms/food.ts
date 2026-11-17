@@ -37,7 +37,7 @@ export const foodRoom: Room = {
    ]
   },
   {
-   "e": "🔧",
+   "e": "/icons/can-opener.svg",
    "b": "u",
    "en": [
     "Manual can opener",
@@ -275,7 +275,7 @@ export const foodRoom: Room = {
     },
     {
      "id": "opener",
-     "e": "🔧",
+     "e": "/icons/can-opener.svg",
      "name": {
       "en": "Manual can opener",
       "ht": "Ouvrebwat alamen"

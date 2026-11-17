@@ -229,7 +229,7 @@ export const energyRoom: Room = {
    "items": [
     {
      "id": "gen",
-     "e": "⚙️",
+     "e": "/icons/generator.svg",
      "name": {
       "en": "Portable generator",
       "ht": "Jeneratè pòtab"

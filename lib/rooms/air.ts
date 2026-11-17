@@ -25,7 +25,7 @@ export const airRoom: Room = {
  },
  "items": [
   {
-   "e": "📟",
+   "e": "/icons/co-alarm.svg",
    "b": "u",
    "en": [
     "Battery carbon monoxide (CO) alarm",
@@ -49,7 +49,7 @@ export const airRoom: Room = {
    ]
   },
   {
-   "e": "🎞️",
+   "e": "/icons/duct-tape.svg",
    "b": "u",
    "en": [
     "Duct tape and plastic sheeting",
@@ -111,7 +111,7 @@ export const airRoom: Room = {
    "critical": true
   },
   {
-   "e": "⚙️",
+   "e": "/icons/generator.svg",
    "b": "a",
    "en": [
     "Generator running in the garage, door open",
@@ -232,7 +232,7 @@ export const airRoom: Room = {
    "items": [
     {
      "id": "co",
-     "e": "📟",
+     "e": "/icons/co-alarm.svg",
      "name": {
       "en": "CO alarm",
       "ht": "Alam CO"
@@ -253,7 +253,7 @@ export const airRoom: Room = {
     },
     {
      "id": "gen",
-     "e": "⚙️",
+     "e": "/icons/generator.svg",
      "name": {
       "en": "Portable generator",
       "ht": "Jeneratè pòtab"
@@ -312,7 +312,7 @@ export const airRoom: Room = {
     },
     {
      "id": "sip",
-     "e": "🎞️",
+     "e": "/icons/duct-tape.svg",
      "name": {
       "en": "Shelter-in-place kit (tape, plastic, radio)",
       "ht": "Twous pou rete anndan (tep, plastik, radyo)"

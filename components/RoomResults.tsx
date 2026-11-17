@@ -6,6 +6,7 @@ import type { RoomResult } from "@/lib/scoring";
 import { useLang } from "./LangProvider";
 import { BADGES } from "@/lib/badges";
 import type { StringKey } from "@/lib/i18n";
+import Icon from "./Icon";
 
 export type Save = "saving" | "saved" | "failed";
 
@@ -27,7 +28,7 @@ export default function RoomResults({ room, result, save, newBadges, onRestart, 
     const it = room.items.find((x) => x.en[0] === en);
     if (it) return it[lang][0];
     for (const S of room.stages) {
-      if (S.kind === "place") { const p = S.items.find((x) => x.name.en === en); if (p) return `${p.e} ${p.name[lang]}`; }
+      if (S.kind === "place") { const p = S.items.find((x) => x.name.en === en); if (p) return <><Icon e={p.e} /> {p.name[lang]}</>; }
       else { const q = S.qs.find((x) => x.en.q === en); if (q) return q[lang].q; }
     }
     return en;

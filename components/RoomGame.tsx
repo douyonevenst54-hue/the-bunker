@@ -8,6 +8,7 @@ import { ROOMS_3D } from "@/lib/rooms/three-d";
 import { scoreRoom, type RoomResult } from "@/lib/scoring";
 import { useLang } from "./LangProvider";
 import RoomResults, { type Save } from "./RoomResults";
+import Icon from "./Icon";
 
 type Screen = { kind: "intro" } | { kind: "sort"; i: number } | { kind: "stage"; s: number; i: number } | { kind: "results" };
 
@@ -104,7 +105,7 @@ export default function RoomGame({ room, reviewed }: { room: Room; reviewed?: { 
         <div className="card">
           <div className="stage">{t("s1")}</div><h2>{t("s1t")}</h2>
           <div className="count">{screen.i + 1} {t("of")} {room.items.length}</div>
-          <div className="item"><div className="em">{it.e}</div><div className="nm">{it[lang][0]}</div></div>
+          <div className="item"><div className="em"><Icon e={it.e} /></div><div className="nm">{it[lang][0]}</div></div>
           <div className="bins">
             {bins.map(([k, ic, lb]) => (
               <button key={k} disabled={!!p} className={`bin ${p ? (k === it.b ? "right" : k === p ? "wrong" : "") : ""}`}
