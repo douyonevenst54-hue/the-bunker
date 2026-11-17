@@ -254,3 +254,12 @@ h3{font-family:Oswald,sans-serif;font-size:18px;margin-bottom:6px}
 .shared-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .shared-badges .nb{background:#171c1f;border:1px solid var(--line);border-radius:12px;padding:6px 10px;font-weight:600;font-size:14px}
 .shared-badges .nb span{font-size:20px;margin-right:6px;vertical-align:-3px}
+
+/* step 14: launch polish */
+.site-foot{margin:28px 0 18px;text-align:center;color:var(--muted);font-size:12.5px;line-height:1.8}
+.site-foot a{color:var(--muted)}
+.legal h2{margin-top:20px;font-size:18px}
+.legal li{margin:6px 0}
+.legal-ht{background:#1b222b;border-left:3px solid var(--amber);border-radius:8px;padding:10px 12px;margin:12px 0;font-size:14px}
+.check-line{display:flex;gap:8px;align-items:flex-start;font-size:13px;margin:8px 0;color:var(--muted)}
+.check-line input{margin-top:3px}

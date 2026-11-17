@@ -27,6 +27,7 @@ Next.js (App Router) · TypeScript · Prisma · Neon PostgreSQL · Vercel
 - [x] 3D Medical room (clinic look; spots: closet, high cabinet, bathroom, fridge, attic, kids table)
 - [x] 3D for all six rooms (each with its own look and furniture); custom drawn icons where no emoji fits
 - [x] Share progress: public page /p/<code> (first name, rooms, levels, badges), link-preview image, stop sharing anytime
+- [x] Launch polish: Privacy & Terms (EN + Kreyòl summary), 13+/parent confirmation, sign-in rate limit, security headers, sitemap/robots, home-screen app icon, link previews, 404, Vercel Analytics
 - [ ] School / organization licenses
 
 ## Develop
@@ -54,3 +55,6 @@ The paywall turns on by itself once these Vercel env vars are set (until then ev
 Webhook endpoint: `https://buildthebunker.com/api/billing/webhook` with events `checkout.session.completed`,
 `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`.
 Admins are always members. Free rooms are listed in `lib/plan.ts` (`FREE_ROOMS`).
+
+## Contact email
+Set `CONTACT_EMAIL` in Vercel (shown in the footer, Privacy and Terms). Default: hello@buildthebunker.com.

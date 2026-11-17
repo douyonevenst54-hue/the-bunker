@@ -6,12 +6,18 @@ import { LangProvider, LangToggle } from "@/components/LangProvider";
 import { asLang, LANG_COOKIE, STRINGS } from "@/lib/i18n";
 import { getPlayer } from "@/lib/session";
 import { isAdmin } from "@/lib/admin";
+import { Analytics } from "@vercel/analytics/next";
 
+const DESC = "An emergency-preparedness game for families, in English and Haitian Creole. Free to start. Built by Dr. Jhon Evenst Douyon, MD, MPH.";
 export const metadata: Metadata = {
   title: "THE BUNKER — Build your bunker. Protect lives.",
-  description: "A free emergency-preparedness game in English and Haitian Creole. Built by Dr. Jhon Evenst Douyon, MD, MPH.",
+  description: DESC,
   metadataBase: new URL("https://buildthebunker.com"),
+  applicationName: "THE BUNKER",
+  openGraph: { title: "THE BUNKER — Build your bunker. Protect lives.", description: DESC, type: "website", siteName: "THE BUNKER" },
+  twitter: { card: "summary_large_image" },
 };
+export const viewport = { themeColor: "#10151c" };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = asLang((await cookies()).get(LANG_COOKIE)?.value);
@@ -35,8 +41,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </div>
             </header>
             {children}
+            <footer className="site-foot">
+              <Link href="/privacy">{s.privacy}</Link> · <Link href="/terms">{s.terms}</Link> · <a href={`mailto:${process.env.CONTACT_EMAIL || "hello@buildthebunker.com"}`}>{s.contact}</a>
+              <div>© {new Date().getFullYear()} THE BUNKER · Dr. Jhon Evenst Douyon, MD, MPH</div>
+            </footer>
           </div>
         </LangProvider>
+        <Analytics />
       </body>
     </html>
   );

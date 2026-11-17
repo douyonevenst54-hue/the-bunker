@@ -4,6 +4,7 @@ import { prisma, dbEnabled } from "@/lib/db";
 import { getPlayer, setSession } from "@/lib/session";
 import { mergeGuestInto } from "@/lib/progress";
 import { checkCredentials } from "@/lib/auth-input";
+import { clientIp, tooManyFailures, recordFailure, clearFailures } from "@/lib/ratelimit";
 
 export async function POST(req: Request) {
   if (!dbEnabled) return NextResponse.json({ error: "errServer" }, { status: 503 });
@@ -11,10 +12,14 @@ export async function POST(req: Request) {
   const check = checkCredentials(body);
   if ("error" in check) return NextResponse.json({ error: "errLogin" }, { status: 400 });
 
+  const ip = clientIp(req);
+  if (await tooManyFailures(check.email, ip)) return NextResponse.json({ error: "errTooMany" }, { status: 429 });
   const account = await prisma.player.findUnique({ where: { email: check.email } });
   if (!account?.passwordHash || !(await bcrypt.compare(check.password, account.passwordHash))) {
+    await recordFailure(check.email, ip);
     return NextResponse.json({ error: "errLogin" }, { status: 401 });
   }
+  await clearFailures(check.email);
   const current = await getPlayer();
   if (current && !current.email) await mergeGuestInto(current.id, account.id);
   await setSession(account.id);

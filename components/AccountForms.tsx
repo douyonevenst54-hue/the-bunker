@@ -32,7 +32,7 @@ export default function AccountForms({ email, name }: { email: string | null; na
     try {
       const r = await fetch(`/api/auth/${mode}`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: f.get("email"), password: f.get("password"), name: f.get("name") }),
+        body: JSON.stringify({ email: f.get("email"), password: f.get("password"), name: f.get("name"), age13: f.get("age13") === "on" }),
       });
       const data = await r.json().catch(() => ({}));
       if (!r.ok) { setErr((data.error as StringKey) || "errServer"); return; }
@@ -56,6 +56,9 @@ export default function AccountForms({ email, name }: { email: string | null; na
         <label htmlFor="password">{t("password")}</label>
         <input id="password" name="password" type="password" required minLength={8}
           autoComplete={mode === "register" ? "new-password" : "current-password"} />
+        {mode === "register" && (
+          <label className="check-line"><input type="checkbox" name="age13" required /> <span>{t("ageConfirm")} <a href="/terms" target="_blank">{t("terms")}</a> · <a href="/privacy" target="_blank">{t("privacy")}</a></span></label>
+        )}
         {err && <div className="err">{t(err)}</div>}
         <button className="btn" disabled={busy}>{busy ? "…" : mode === "register" ? t("createAccount") : t("signIn")}</button>
       </form>
