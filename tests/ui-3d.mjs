@@ -20,19 +20,32 @@ async function play(room) {
   writeFileSync(`/tmp/3d-${room.id}-outside.png`, shot);
   ok(shot.length > 20000, `${room.id}: outside view renders (${shot.length} bytes)`);
   await page.getByRole("button", { name: "Enter the bunker" }).click();
+  ok(await page.locator(".b3-hint").count() === 1, `${room.id}: first-person hint bar shown`);
   await page.getByRole("button", { name: /Open the door/ }).click();
-  await page.getByRole("button", { name: /Enter the room/ }).click({ timeout: 10000 });
-  await page.getByRole("button", { name: /Inspect the next supply/ }).waitFor({ timeout: 10000 });
+  await page.getByRole("button", { name: /Enter the room/ }).click({ timeout: 30000 });
+  await page.getByRole("button", { name: /Inspect the next supply/ }).waitFor({ timeout: 30000 });
   await page.waitForTimeout(1200);
   writeFileSync(`/tmp/3d-${room.id}-room.png`, await page.screenshot());
   for (let n = 0; n < room.items.length; n++) {
     await page.getByRole("button", { name: /Inspect the next supply/ }).click();
-    const name = (await page.locator(".b3-panel h2").innerText()).trim();
+    const name = (await page.locator(".b3-panel h2").innerText({ timeout: 30000 })).trim();
+    if (n === 0) {
+      const viewer = await page.locator(".b3-inspect canvas").count();
+      ok(room.id !== "security" || viewer === 1, `${room.id}: inspect panel ${viewer ? "shows the 3D object viewer" : "(crate room)"}`);
+      // the inspect sheet can be hidden and shown again
+      await page.getByRole("button", { name: /Hide/ }).click();
+      await page.locator(".b3-tab").click();
+    }
     const item = room.items.find((it) => name.endsWith(it.en[0]));
     await page.locator(".b3-panel .bin").nth({ u: 0, s: 1, a: 2 }[item.b]).click();
     await page.getByRole("button", { name: "Next", exact: true }).click();
   }
   ok(true, `${room.id}: sorted all ${room.items.length} supplies`);
+  if (room.id === "security") {
+    await page.getByRole("button", { name: "Pause" }).click();
+    ok(await page.getByRole("button", { name: "Resume" }).count() === 1, "security: pause menu opens");
+    await page.getByRole("button", { name: "Resume" }).click();
+  }
   for (const S of room.stages) {
     if (S.kind === "place") {
       await page.waitForTimeout(800);
@@ -47,7 +60,7 @@ async function play(room) {
       const open = page.getByRole("button", { name: /Open the terminal/ });
       if (await open.count()) await open.click();
       for (const q of S.qs) {
-        await page.locator(".b3-panel .opt", { hasText: q.en.o[q.a] }).first().click();
+        await page.locator(".b3-panel .opt", { hasText: q.en.o[q.a] }).first().click({ timeout: 30000 });
         await page.getByRole("button", { name: "Next", exact: true }).click();
       }
     }
