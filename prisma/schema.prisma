@@ -20,6 +20,8 @@ model Player {
   role         String         @default("player")
   /// Stripe billing (set by the webhook). Membership = subStatus "active" or "trialing".
   stripeCustomerId String?    @unique
+  /// Public share page /p/<shareCode>; null = not shared.
+  shareCode    String?        @unique
   subStatus    String?
   subInterval  String?
   subPeriodEnd DateTime?

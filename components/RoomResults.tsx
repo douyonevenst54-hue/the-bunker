@@ -7,6 +7,7 @@ import { useLang } from "./LangProvider";
 import { BADGES } from "@/lib/badges";
 import type { StringKey } from "@/lib/i18n";
 import Icon from "./Icon";
+import ShareButton from "./ShareButton";
 
 export type Save = "saving" | "saved" | "failed";
 
@@ -66,6 +67,7 @@ export default function RoomResults({ room, result, save, newBadges, onRestart, 
           </div>
         )}
         <div className="status">{save === "saving" ? t("saving") : save === "saved" ? t("saved") : t("notSaved")}</div>
+        {r.passed && save === "saved" && <ShareButton label={t("shareResult")} text={t("shareRoomText").replace("{room}", ui.title)} />}
         {r.passed && room.next
           ? <A className="btn" href={nextHref ?? `/room/${room.next}`}>{t("nextRoom")} →</A>
           : !r.passed && <p className="status">{t("unlockHint")}</p>}

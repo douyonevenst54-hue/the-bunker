@@ -26,6 +26,7 @@ Next.js (App Router) · TypeScript · Prisma · Neon PostgreSQL · Vercel
 - [x] 3D Water room (beta): first-person, tap-to-move; same content and scoring; 2D stays as Lite mode
 - [x] 3D Medical room (clinic look; spots: closet, high cabinet, bathroom, fridge, attic, kids table)
 - [x] 3D for all six rooms (each with its own look and furniture); custom drawn icons where no emoji fits
+- [x] Share progress: public page /p/<code> (first name, rooms, levels, badges), link-preview image, stop sharing anytime
 - [ ] School / organization licenses
 
 ## Develop

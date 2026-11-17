@@ -1,4 +1,5 @@
 "use client";
+import ShareButton from "./ShareButton";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Scenario } from "@/lib/scenarios/types";
@@ -138,6 +139,7 @@ export default function ScenarioGame({ sc }: { sc: Scenario }) {
           </>
         )}
         <div className="status">{save === "saving" ? t("saving") : save === "saved" ? t("saved") : t("notSaved")}</div>
+        {r.passed && save === "saved" && <ShareButton label={t("shareResult")} text={t("shareLevelText").replace("{level}", sc.title[lang].replace(/^[^:]*:\s*/, ""))} />}
         <button className="btn" onClick={restart}>{t("again")}</button>
         <Link className="btn ghost" href="/">{t("backToBunker")}</Link>
         <div className="src">{t("sources")}<br />
