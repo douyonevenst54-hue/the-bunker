@@ -96,7 +96,7 @@ export const medicalRoom: Room = {
    ]
   },
   {
-   "e": "🪙",
+   "e": "/icons/space-blanket.svg",
    "b": "u",
    "en": [
     "Emergency (space) blanket",
@@ -145,7 +145,7 @@ export const medicalRoom: Room = {
    ]
   },
   {
-   "e": "💨",
+   "e": "/icons/hair-dryer.svg",
    "b": "s",
    "en": [
     "Hair dryer",

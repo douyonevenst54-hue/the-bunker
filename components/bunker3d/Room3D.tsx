@@ -8,6 +8,7 @@ import { useLang } from "../LangProvider";
 import RoomResults, { type Save } from "../RoomResults";
 import { Scene, VIEWS, SLOTS, crateSpot, themeFor, type V3, type CrateState } from "./World";
 import { ROOMS_3D } from "@/lib/rooms/three-d";
+import Icon from "../Icon";
 
 type Phase = "brief" | "outside" | "corridor" | "room" | "results";
 type View = { pos: V3; look: V3 };
@@ -175,7 +176,7 @@ export default function Room3D({ room, otherRooms }: { room: Room; otherRooms: s
       panel = (
         <div className="b3-panel">
           <div className="stage">{t("discovered")} · {sorted.filter(Boolean).length + (b ? 0 : 1)} {t("of")} {room.items.length}</div>
-          <h2><span className="b3-em">{it.e}</span> {it[lang][0]}</h2>
+          <h2><span className="b3-em"><Icon e={it.e} /></span> {it[lang][0]}</h2>
           {!b && <p>{t("whatDo")}</p>}
           <div className="bins">
             {bins.map(([k, ic, lb]) => (
@@ -209,7 +210,7 @@ export default function Room3D({ room, otherRooms }: { room: Room; otherRooms: s
         {placeS.scene && <p className="b3-scene">{placeS.scene[lang]}</p>}
         {fb && placeFb && (
           <div className={`fb ${placeFb.r === "correct" ? "" : "no"} ${placeFb.r === "unsafe" ? "unsafe" : ""}`}>
-            <strong>{placeFb.r === "correct" ? "✅ " + t("right") : placeFb.r === "unsafe" ? "⚠️ " + t("unsafe") : "❌ " + t("wrong")} · {fb.e} {fb.name[lang]}</strong>
+            <strong>{placeFb.r === "correct" ? "✅ " + t("right") : placeFb.r === "unsafe" ? "⚠️ " + t("unsafe") : "❌ " + t("wrong")} · <Icon e={fb.e} /> {fb.name[lang]}</strong>
             <p>{placeFb.r === "correct" ? fb.why.ok[lang] : placeFb.r === "unsafe" ? (fb.why.unsafe ?? fb.why.wrong)[lang] : fb.why.wrong[lang]}</p>
             {placeFb.r !== "correct" && <p className="best">{t("bestSpot")}: {best}</p>}
           </div>
@@ -220,7 +221,7 @@ export default function Room3D({ room, otherRooms }: { room: Room; otherRooms: s
             {placeS.items.map((it, i) => placed[i] === null && (
               <button key={it.id} className={`tray-item ${selItem === i ? "sel" : ""}`} aria-pressed={selItem === i}
                 onClick={() => { setSelItem(selItem === i ? null : i); setPlaceFb(null); }}>
-                <span className="ti-e">{it.e}</span><span className="ti-n">{it.name[lang]}</span>
+                <span className="ti-e"><Icon e={it.e} /></span><span className="ti-n">{it.name[lang]}</span>
               </button>
             ))}
           </div>

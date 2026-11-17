@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import type { Lang, PlaceStage } from "@/lib/rooms/types";
 import { judgePlacement, type Placement } from "@/lib/scoring";
 import type { StringKey } from "@/lib/i18n";
+import Icon from "./Icon";
 
 const PW = 360, PH = 300;
 
@@ -94,7 +95,9 @@ export default function PlaceBoard({ S, lang, t, onDone }: {
               {here.map((i, k) => (
                 <g key={i}>
                   <rect x={z.x + 8 + k * 38} y={z.y + z.h - 38} width="32" height="30" rx="7" className={`pz-item ${results[i]}`} />
-                  <text x={z.x + 24 + k * 38} y={z.y + z.h - 17} textAnchor="middle" className="pz-emoji">{S.items[i].e}</text>
+                  {S.items[i].e.startsWith("/")
+                    ? <image href={S.items[i].e} x={z.x + 12 + k * 38} y={z.y + z.h - 35} width="24" height="24" />
+                    : <text x={z.x + 24 + k * 38} y={z.y + z.h - 17} textAnchor="middle" className="pz-emoji">{S.items[i].e}</text>}
                 </g>
               ))}
             </g>
@@ -106,7 +109,7 @@ export default function PlaceBoard({ S, lang, t, onDone }: {
         <div className={`fb ${feedback.result === "correct" ? "" : "no"} ${feedback.result === "unsafe" ? "unsafe" : ""}`}>
           <strong>
             {feedback.result === "correct" ? "✅ " + t("right") : feedback.result === "unsafe" ? "⚠️ " + t("unsafe") : "❌ " + t("wrong")}
-            {" · "}{fb.e} {fb.name[lang]}
+            {" · "}<Icon e={fb.e} /> {fb.name[lang]}
           </strong>
           <p>{feedback.result === "correct" ? fb.why.ok[lang] : feedback.result === "unsafe" ? (fb.why.unsafe ?? fb.why.wrong)[lang] : fb.why.wrong[lang]}</p>
           {feedback.result !== "correct" && <p className="best">{t("bestSpot")}: {bestZones}</p>}
@@ -121,7 +124,7 @@ export default function PlaceBoard({ S, lang, t, onDone }: {
               onPointerCancel={() => { start.current = null; setDrag(null); }}
               onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelected(selected === i ? null : i); } }}
               aria-pressed={selected === i}>
-              <span className="ti-e">{it.e}</span><span className="ti-n">{it.name[lang]}</span>
+              <span className="ti-e"><Icon e={it.e} /></span><span className="ti-n">{it.name[lang]}</span>
             </button>
           ))}
         </div>
@@ -130,7 +133,7 @@ export default function PlaceBoard({ S, lang, t, onDone }: {
 
       {drag && (
         <div className="drag-ghost" style={{ left: drag.x, top: drag.y }} aria-hidden>
-          {S.items[drag.item].e}
+          <Icon e={S.items[drag.item].e} />
         </div>
       )}
     </>

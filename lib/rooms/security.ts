@@ -25,7 +25,7 @@ export const securityRoom: Room = {
  },
  "items": [
   {
-   "e": "🚨",
+   "e": "/icons/smoke-alarm.svg",
    "b": "u",
    "en": [
     "Working smoke alarms",
@@ -135,7 +135,7 @@ export const securityRoom: Room = {
    "critical": true
   },
   {
-   "e": "🎀",
+   "e": "/icons/wreath.svg",
    "b": "s",
    "en": [
     "Decorative door wreath",
@@ -231,7 +231,7 @@ export const securityRoom: Room = {
    "items": [
     {
      "id": "alarm",
-     "e": "🚨",
+     "e": "/icons/smoke-alarm.svg",
      "name": {
       "en": "Smoke alarm",
       "ht": "Alam lafimen"

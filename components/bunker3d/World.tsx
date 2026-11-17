@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
+import Icon from "../Icon";
 
 export type V3 = [number, number, number];
 
@@ -35,12 +36,24 @@ export const SLOTS: { at: V3; view: { pos: V3; look: V3 }; kind: string }[] = [
 const ZONE_KIND: Record<string, string> = {
   shelf: "shelf", high: "high", kitchen: "counter", window: "window", fuel: "hazard", kids: "kids",
   closet: "closet", highcab: "high", bath: "bath", fridge: "fridge", attic: "attic", table: "table",
+  // security
+  hall: "hall", bedroom: "bed", kitchenexit: "exitdoor", stove: "stove", backdoor: "backdoor", upwindow: "upwindow",
+  // food
+  pantry: "pantry", kit: "bin", freezer: "freezer", floor: "basement",
+  // air
+  bedrooms: "hall", interior: "interior", porch: "porch", garage: "garage", yard: "yard",
+  // energy
+  panel: "panel", outlet: "outlet", bedside: "bedside", drawer: "drawers",
 };
 
-export type Theme = { wall: string; floor: string; ceil: string; door: string; pallet: string; light: string; decor: "water" | "medical" | "none" };
+export type Theme = { wall: string; floor: string; ceil: string; door: string; pallet: string; light: string; decor: "water" | "medical" | "security" | "food" | "air" | "energy" | "none" };
 export const THEMES: Record<string, Theme> = {
   water: { wall: "#606870", floor: "#40464c", ceil: "#4a5056", door: "#2f6f9f", pallet: "#8b6a45", light: "#ffeccc", decor: "water" },
   medical: { wall: "#c9d3d6", floor: "#7f8c8f", ceil: "#dfe6e8", door: "#b8322c", pallet: "#e7ecef", light: "#f2fbff", decor: "medical" },
+  security: { wall: "#5a5f66", floor: "#33373c", ceil: "#43474d", door: "#c0392b", pallet: "#6b7178", light: "#fff1d6", decor: "security" },
+  food: { wall: "#d8c9a8", floor: "#8a6a45", ceil: "#e6dcc4", door: "#4f8a3a", pallet: "#a07a4c", light: "#fff0cf", decor: "food" },
+  air: { wall: "#a9bcc6", floor: "#5f6e75", ceil: "#c3d2d9", door: "#5aa9c9", pallet: "#8fa3ad", light: "#eaf7ff", decor: "air" },
+  energy: { wall: "#3f444b", floor: "#2b2f34", ceil: "#363a40", door: "#e0a326", pallet: "#55595f", light: "#ffe6a8", decor: "energy" },
 };
 export const themeFor = (id: string): Theme => THEMES[id] ?? { ...THEMES.water, decor: "none" };
 
@@ -289,6 +302,126 @@ function StationModel({ kind }: { kind: string }) {
         <mesh position={[-0.3, 0.6, 0.35]}><sphereGeometry args={[0.09, 12, 12]} /><meshStandardMaterial color="#e2504a" /></mesh>
         <Box p={[0.25, 0.6, 0.4]} s={[0.15, 0.15, 0.15]} c="#4f9be0" />
       </group>);
+    case "hall":
+      return (<group>
+        <Box p={[0, 1.15, 0]} s={[1.1, 2.3, 0.08]} c="#7d6a55" />
+        <Box p={[0, 2.35, 0]} s={[1.3, 0.1, 0.1]} c="#5b4b3b" />
+        <mesh position={[0, 2.92, 0.5]}><cylinderGeometry args={[0.16, 0.16, 0.06, 20]} /><meshStandardMaterial color="#f2f2ee" /></mesh>
+      </group>);
+    case "bed":
+      return (<group>
+        <Box p={[0, 0.25, 0.7]} s={[1.3, 0.3, 1.6]} c="#5a4632" />
+        <Box p={[0, 0.45, 0.7]} s={[1.25, 0.15, 1.55]} c="#e8e2d5" />
+        <Box p={[0, 0.58, 0.15]} s={[0.9, 0.12, 0.35]} c="#ffffff" />
+        <Box p={[0, 0.7, 1.25]} s={[1.26, 0.06, 0.5]} c="#4f7fb3" />
+        <Box p={[0, 0.75, -0.02]} s={[1.3, 1.0, 0.08]} c="#4a3a29" />
+      </group>);
+    case "exitdoor":
+      return (<group>
+        <Box p={[0, 1.15, 0]} s={[1.0, 2.3, 0.08]} c="#8a2f2f" />
+        <Box p={[0, 2.55, 0.05]} s={[0.6, 0.22, 0.04]} c="#1f9d55" />
+        <Box p={[0.75, 0.45, 0.3]} s={[0.5, 0.9, 0.6]} c="#9aa3a8" />
+      </group>);
+    case "stove":
+      return (<group>
+        <Box p={[0, 0.45, 0.25]} s={[0.9, 0.9, 0.6]} c="#d9d9d4" />
+        {[[-0.2, 0.1], [0.2, 0.1], [-0.2, 0.4], [0.2, 0.4]].map(([x, z], i) => (
+          <mesh key={i} position={[x, 0.91, z]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.06, 0.11, 16]} /><meshStandardMaterial color="#2b2b2b" /></mesh>
+        ))}
+        <mesh position={[-0.2, 0.92, 0.1]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[0.06, 16]} /><meshStandardMaterial color="#ff5a2a" emissive="#ff3b0f" emissiveIntensity={0.8} /></mesh>
+        <Box p={[0, 1.9, 0.2]} s={[0.9, 0.3, 0.5]} c="#b9bec2" />
+      </group>);
+    case "backdoor":
+      return (<group>
+        <Box p={[0, 1.15, 0]} s={[1.0, 2.3, 0.08]} c="#6b5a45" />
+        <Box p={[-0.15, 0.25, 0.45]} s={[0.55, 0.5, 0.5]} c="#b88a55" />
+        <Box p={[0.2, 0.7, 0.45]} s={[0.5, 0.4, 0.45]} c="#c79b63" />
+      </group>);
+    case "upwindow":
+      return (<group>
+        <mesh position={[0, 1.8, 0.02]}><planeGeometry args={[1.0, 0.9]} /><meshStandardMaterial color="#9fd0ef" emissive="#6fb6e6" emissiveIntensity={0.4} /></mesh>
+        <Box p={[0, 1.33, 0.1]} s={[1.2, 0.06, 0.2]} c="#e6e2d8" />
+        <Box p={[0, 0.3, 0.35]} s={[1.0, 0.25, 0.4]} c="#7a5c3e" />
+      </group>);
+    case "pantry":
+      return (<group>
+        {[0.3, 0.9, 1.5].map((y) => <Box key={y} p={[0, y, 0]} s={[1.6, 0.06, 0.5]} c="#9b7a52" />)}
+        {[-0.78, 0.78].map((x) => <Box key={x} p={[x, 0.9, 0]} s={[0.06, 1.8, 0.5]} c="#7a5c3e" />)}
+        {[-0.5, -0.2, 0.1, 0.4].map((x, i) => (
+          <mesh key={i} position={[x, 1.03, 0]}><cylinderGeometry args={[0.09, 0.09, 0.2, 12]} /><meshStandardMaterial color={["#c0392b", "#2e86c1", "#27ae60", "#d4ac0d"][i]} /></mesh>
+        ))}
+      </group>);
+    case "bin":
+      return (<group>
+        <Box p={[0, 0.3, 0.3]} s={[1.0, 0.6, 0.6]} c="#d35400" r={0.5} />
+        <Box p={[0, 0.63, 0.3]} s={[1.05, 0.06, 0.65]} c="#a04000" />
+        <Box p={[0, 0.35, 0.61]} s={[0.4, 0.12, 0.02]} c="#ffffff" />
+      </group>);
+    case "freezer":
+      return (<group>
+        <Box p={[0, 0.45, 0.35]} s={[1.3, 0.9, 0.7]} c="#eef3f5" r={0.4} />
+        <Box p={[0, 0.92, 0.35]} s={[1.32, 0.05, 0.72]} c="#cfe1ea" />
+        <Box p={[0, 0.8, 0.71]} s={[0.5, 0.05, 0.03]} c="#9aa3a8" />
+      </group>);
+    case "basement":
+      return (<group>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0.6]}><circleGeometry args={[0.7, 24]} /><meshStandardMaterial color="#4f7f99" transparent opacity={0.7} metalness={0.3} roughness={0.2} /></mesh>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.04, 0.6]}><circleGeometry args={[0.1, 12]} /><meshStandardMaterial color="#2b2f34" /></mesh>
+      </group>);
+    case "interior":
+      return (<group>
+        <Box p={[0, 1.15, 0]} s={[1.0, 2.3, 0.08]} c="#7d6a55" />
+        <Box p={[0.75, 0.4, 0.3]} s={[0.5, 0.8, 0.5]} c="#6b5a45" />
+        <Box p={[0.75, 0.9, 0.3]} s={[0.3, 0.18, 0.12]} c="#2c2f33" />
+      </group>);
+    case "porch":
+      return (<group>
+        <mesh position={[0, 1.7, 0.02]}><planeGeometry args={[1.0, 0.8]} /><meshStandardMaterial color="#9fd0ef" /></mesh>
+        <Box p={[0, 0.06, 0.6]} s={[1.8, 0.12, 1.0]} c="#8a6a45" />
+        {[-0.8, -0.4, 0, 0.4, 0.8].map((x) => <Box key={x} p={[x, 0.45, 1.05]} s={[0.05, 0.7, 0.05]} c="#e8e2d5" />)}
+        <Box p={[0, 0.8, 1.05]} s={[1.7, 0.05, 0.05]} c="#e8e2d5" />
+      </group>);
+    case "garage":
+      return (<group>
+        <Box p={[0, 1.1, 0]} s={[1.8, 2.2, 0.08]} c="#9aa3a8" />
+        {[0.5, 0.9, 1.3, 1.7].map((y) => <Box key={y} p={[0, y, 0.05]} s={[1.8, 0.03, 0.02]} c="#7a8a94" />)}
+        <Box p={[0, 0.35, 0.6]} s={[1.4, 0.5, 0.9]} c="#2e5f8a" />
+      </group>);
+    case "yard":
+      return (<group>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0.6]}><planeGeometry args={[1.8, 1.2]} /><meshStandardMaterial color="#4f8a3a" /></mesh>
+        {[-0.8, -0.4, 0, 0.4, 0.8].map((x) => <Box key={x} p={[x, 0.45, 0.02]} s={[0.12, 0.9, 0.05]} c="#e8e2d5" />)}
+        <mesh position={[0.6, 0.9, 0.5]}><coneGeometry args={[0.35, 0.9, 10]} /><meshStandardMaterial color="#2f6b2f" /></mesh>
+        <Box p={[0.6, 0.25, 0.5]} s={[0.1, 0.5, 0.1]} c="#6b4a2b" />
+      </group>);
+    case "panel":
+      return (<group>
+        <Box p={[0, 1.4, 0.06]} s={[0.7, 1.0, 0.12]} c="#8d969c" />
+        {[1.65, 1.5, 1.35, 1.2].map((y) => <Box key={y} p={[0, y, 0.13]} s={[0.45, 0.08, 0.02]} c="#3a3f44" />)}
+        <Box p={[0.5, 1.4, 0.08]} s={[0.25, 0.5, 0.15]} c="#e0a326" />
+      </group>);
+    case "outlet":
+      return (<group>
+        <Box p={[0, 0.45, 0.02]} s={[0.3, 0.4, 0.03]} c="#f2f2ee" />
+        <Box p={[-0.05, 0.5, 0.04]} s={[0.03, 0.08, 0.02]} c="#2c2f33" />
+        <Box p={[0.05, 0.5, 0.04]} s={[0.03, 0.08, 0.02]} c="#2c2f33" />
+        <Box p={[-0.05, 0.38, 0.04]} s={[0.03, 0.08, 0.02]} c="#2c2f33" />
+        <Box p={[0.05, 0.38, 0.04]} s={[0.03, 0.08, 0.02]} c="#2c2f33" />
+      </group>);
+    case "bedside":
+      return (<group>
+        <Box p={[0, 0.3, 0.25]} s={[0.6, 0.6, 0.45]} c="#7a5c3e" />
+        <mesh position={[0, 0.75, 0.25]}><cylinderGeometry args={[0.05, 0.08, 0.3, 10]} /><meshStandardMaterial color="#c9ced3" /></mesh>
+        <mesh position={[0, 0.98, 0.25]}><coneGeometry args={[0.18, 0.22, 16, 1, true]} /><meshStandardMaterial color="#f5e6c4" emissive="#ffd890" emissiveIntensity={0.4} side={THREE.DoubleSide} /></mesh>
+        <Box p={[-0.9, 0.3, 0.7]} s={[1.0, 0.3, 1.4]} c="#e8e2d5" />
+      </group>);
+    case "drawers":
+      return (<group>
+        <Box p={[0, 0.45, 0.3]} s={[1.4, 0.9, 0.6]} c="#a07a4c" />
+        {[0.7, 0.42, 0.14].map((y) => <Box key={y} p={[0, y, 0.61]} s={[1.3, 0.22, 0.02]} c="#b88a55" />)}
+        {[0.7, 0.42, 0.14].map((y) => <Box key={"h" + y} p={[0, y, 0.63]} s={[0.25, 0.04, 0.03]} c="#d8d8d8" />)}
+        <Box p={[0, 0.92, 0.3]} s={[1.45, 0.05, 0.65]} c="#d9d4c7" />
+      </group>);
     default:
       return <Box p={[0, 0.5, 0]} s={[1, 1, 0.5]} c="#777" />;
   }
@@ -313,6 +446,31 @@ function RoomShell({ th }: { th: Theme }) {
           <Box p={[5.1, 2.35, -11.98]} s={[0.22, 0.7, 0.02]} c="#c62f2a" />
           <Box p={[6, 1.0, -11.99]} s={[9, 0.08, 0.01]} c="#3aa6a0" />
           <Box p={[10.49, 1.0, -7.5]} s={[0.01, 0.08, 9]} c="#3aa6a0" />
+        </group>
+      )}
+      {th.decor === "security" && (
+        <group>
+          <Box p={[5.1, 2.45, -11.98]} s={[0.9, 0.3, 0.03]} c="#1f9d55" />
+          {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => <Box key={x} p={[x, 0.08, -11.98]} s={[0.5, 0.16, 0.01]} c={x % 2 ? "#e0a326" : "#222"} />)}
+        </group>
+      )}
+      {th.decor === "food" && (
+        <group>
+          <Box p={[6, 1.0, -11.99]} s={[9, 0.08, 0.01]} c="#6f9a3e" />
+          <mesh position={[5.1, 2.35, -11.98]}><circleGeometry args={[0.3, 24]} /><meshStandardMaterial color="#e67e22" /></mesh>
+        </group>
+      )}
+      {th.decor === "air" && (
+        <group>
+          {[3.5, 6, 8.5].map((x) => <Box key={x} p={[x, 2.85, -11.9]} s={[0.8, 0.25, 0.2]} c="#c3cbd0" />)}
+          <Box p={[6, 2.95, -7.5]} s={[0.4, 0.15, 8.5]} c="#b7c2c8" />
+        </group>
+      )}
+      {th.decor === "energy" && (
+        <group>
+          <Box p={[5.1, 2.35, -11.98]} s={[0.7, 0.7, 0.02]} c="#e0a326" />
+          <mesh position={[5.1, 2.35, -11.96]}><circleGeometry args={[0.18, 3]} /><meshStandardMaterial color="#222" /></mesh>
+          <Box p={[6, 0.08, -11.99]} s={[9, 0.16, 0.01]} c="#e0a326" />
         </group>
       )}
       {th.decor === "water" && (
@@ -345,7 +503,7 @@ export function Room({ theme, items, crates, glowCrates, onCrate, zones, zoneIds
               <boxGeometry args={[0.5, 0.4, 0.5]} />
               <GlowMat color={col} glow={glowCrates && st === "open"} />
             </mesh>
-            <Label p={[0, 0.5, 0]} size={24} show={showLabels}>{it.e}</Label>
+            <Label p={[0, 0.5, 0]} size={24} show={showLabels}><Icon e={it.e} /></Label>
           </group>
         );
       })}
@@ -361,7 +519,7 @@ export function Room({ theme, items, crates, glowCrates, onCrate, zones, zoneIds
               <meshStandardMaterial color="#ffb02e" transparent opacity={glowZones ? 0.16 : 0} depthWrite={false} />
             </mesh>
             <Label p={[0, 2.65, 0.3]} show={showLabels}>{label}</Label>
-            <Label p={[0, 1.2, 0.5]} size={22} show={showLabels && (placedAt[z]?.length ?? 0) > 0}>{(placedAt[z] ?? []).join(" ")}</Label>
+            <Label p={[0, 1.2, 0.5]} size={22} show={showLabels && (placedAt[z]?.length ?? 0) > 0}>{(placedAt[z] ?? []).map((e, k) => <Icon key={k} e={e} />)}</Label>
           </group>
         );
       })}

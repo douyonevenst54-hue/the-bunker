@@ -1,3 +1,4 @@
+import Icon from "@/components/Icon";
 import { notFound, redirect } from "next/navigation";
 import { getPlayer } from "@/lib/session";
 import { needsPlan } from "@/lib/plan";
@@ -23,7 +24,7 @@ export default async function Review({ params }: { params: Promise<{ id: string 
         <div className="stage">{s.s1}</div>
         {room.items.map((it, i) => (
           <div className="review-q" key={i}>
-            <div className="qq">{it.e} {it[lang][0]}{it.critical ? " ⚠️" : ""}</div>
+            <div className="qq"><Icon e={it.e} /> {it[lang][0]}{it.critical ? " ⚠️" : ""}</div>
             <div className="ok">{bin[it.b]}</div>
             <div className="ex">{it[lang][1]}</div>
           </div>
@@ -35,7 +36,7 @@ export default async function Review({ params }: { params: Promise<{ id: string 
           {S.scene && <p>{S.scene[lang]}</p>}
           {S.kind === "place" ? S.items.map((it) => (
             <div className="review-q" key={it.id}>
-              <div className="qq">{it.e} {it.name[lang]}{it.unsafe?.length ? " ⚠️" : ""}</div>
+              <div className="qq"><Icon e={it.e} /> {it.name[lang]}{it.unsafe?.length ? " ⚠️" : ""}</div>
               {S.zones.map((z) => it.ok.includes(z.id)
                 ? <div className="ok" key={z.id}>✅ {z.label[lang]}</div>
                 : it.unsafe?.includes(z.id)

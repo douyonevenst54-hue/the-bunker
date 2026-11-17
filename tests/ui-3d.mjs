@@ -71,6 +71,16 @@ await page.getByRole("link", { name: /Next room/ }).click();
 await page.waitForURL("**/room/medical/3d");
 ok(true, "Next room → 3D Medical room");
 await play(ROOMS.find((r) => r.id === "medical"));
+// Rooms 3–6 are for members: the admin account (a member, all rooms passed in e2e.mjs) plays them in 3D
+await page.goto(BASE + "/");
+await page.evaluate(async () => { await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: "admin@example.com", password: "adminpass1" }) }); });
+for (const id of ["security", "food", "air", "energy"]) {
+  await page.goto(BASE + `/room/${id}/3d`);
+  await play(ROOMS.find((r) => r.id === id));
+}
+// drawn icons load
+const icon = await page.request.get(BASE + "/icons/water-bottle.svg");
+ok(icon.status() === 200 && (await icon.text()).includes("<svg"), "custom icons are served");
 ok(errors.length === 0, "no page errors" + (errors.length ? ": " + errors.join(" | ") : ""));
 await browser.close();
 console.log(failures ? `\n${failures} 3D FAILED` : "\n3D PASSED");
