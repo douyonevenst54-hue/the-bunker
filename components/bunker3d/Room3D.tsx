@@ -13,6 +13,7 @@ import { Walker, type WalkerApi, type MoveInput, type Interactable } from "./Wal
 import { buildObstacles, stationBox, standSpot, type AABB, type Region } from "./nav";
 import { LAYOUTS } from "./Props";
 import Inspector from "./Inspector";
+import { track } from "@/lib/track";
 
 type Phase = "brief" | "outside" | "corridor" | "room" | "results";
 
@@ -92,7 +93,7 @@ export default function Room3D({ room, otherRooms }: { room: Room; otherRooms: s
   }
 
   /* --------------------------------------------------------------- moves */
-  function enter() { setPhase("outside"); setMinimized(false); }
+  function enter() { track("start", room.id, "3d"); setPhase("outside"); setMinimized(false); }
   function walkIntoRoom() { walker.current?.walkTo(4, -7.5, ROOM_VIEW); }
   function openMainDoor() {
     if (doorOpen) { walker.current?.walkTo(0, -1.6, [0, 1.4, -12]); return; }
@@ -180,6 +181,7 @@ export default function Room3D({ room, otherRooms }: { room: Room; otherRooms: s
       if (!r.ok) throw new Error(String(r.status));
       const data = await r.json();
       setResult(data.result); setNewBadges(Array.isArray(data.newBadges) ? data.newBadges : []); setSave("saved");
+      track("finish", room.id, "3d");
     } catch { setSave("failed"); }
   }
   function restart() {

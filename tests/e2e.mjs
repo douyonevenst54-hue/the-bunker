@@ -243,6 +243,22 @@ ok(sql(`select count(*) from \\\"Player\\\" where email is null`) === "0", "merg
   ok((await g.req("/admin")).status === 404, "admin dashboard hidden from regular players");
   const dashA = await adm.req("/admin");
   ok(dashA.text.includes("% passed") && dashA.text.includes("missed"), "dashboard shows pass rates and most-missed questions");
+  // Step 16: game-first homepage, readiness profile, start → finish funnel
+  const fresh = await new Client().req("/");
+  ok(fresh.text.includes("Would you be ready") && fresh.text.includes('href="/room/water/3d"'), "new visitors see the game-first hero that opens the 3D bunker");
+  const back = await g.req("/");
+  ok(back.text.includes("Preparedness knowledge score") && back.text.includes("does not guarantee safety"), "returning players see their readiness profile with its safety note");
+  ok(!back.text.includes("Would you be ready"), "returning players skip the hero");
+  const ev = (body) => fetch(BASE + "/api/events", { method: "POST", body: JSON.stringify(body) }).then((x) => x.status);
+  const before = Number(sql(`select count(*) from \\"PlayEvent\\"`));
+  ok(await ev({ kind: "start", contentId: "water", mode: "3d", device: "phone", visitor: "testvisitor01" }) === 204
+    && await ev({ kind: "finish", contentId: "water", mode: "3d", device: "phone", visitor: "testvisitor01" }) === 204
+    && await ev({ kind: "start", contentId: "water", mode: "2d", device: "desktop", visitor: "testvisitor02" }) === 204, "funnel events are accepted");
+  await ev({ kind: "start", contentId: "../etc", mode: "3d", device: "phone", visitor: "testvisitor03" });
+  await ev({ kind: "hack", contentId: "water", mode: "3d", device: "phone", visitor: "testvisitor03" });
+  ok(Number(sql(`select count(*) from \\"PlayEvent\\"`)) - before === 3, "malformed events are ignored");
+  const dashF = await adm.req("/admin");
+  ok(dashF.text.includes("Start → finish") && dashF.text.includes("guest → account"), "admin dashboard shows the start → finish funnel");
 
   const NEW = "Safe water for every family";
   r = await g.req("/api/admin/revisions", { method: "POST", body: { contentId: "water", path: "ui.en.title", newValue: NEW } });

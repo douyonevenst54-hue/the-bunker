@@ -78,6 +78,20 @@ const en = {
   sendLink: "Send reset link", resetTitle: "Choose a new password",
   newPassword: "New password (8+ characters)", confirmPassword: "Type it again", savePassword: "Save and sign in",
   errMatch: "The two passwords don't match.", errResetLink: "This reset link is invalid or has expired. Ask for a new one.",
+  heroTag: "Free to play · English & Kreyòl",
+  heroTitle: "Would you be ready when everything changes?",
+  heroSub: "Walk through a 3D survival bunker, learn real emergency skills and make the choices that protect your family.",
+  heroCta: "Enter the bunker", heroClassic: "Prefer a simpler version? Play without 3D",
+  howTitle: "How it works",
+  how1: "Explore", how1s: "Walk the bunker, room by room.",
+  how2: "Discover", how2s: "Inspect each supply: use it, skip it or avoid it.",
+  how3: "Learn", how3s: "Every answer explains why.",
+  how4: "Survive", how4s: "Face a power outage, a storm and a flood.",
+  missionsTitle: "Your missions",
+  readyTitle: "My readiness profile", readyScore: "Preparedness knowledge score",
+  readyNote: "Measures what you've learned in THE BUNKER. It does not guarantee safety in a real emergency.",
+  readyNext: "Recommended next mission", readyImprove: "Improve your score", readyContinue: "Start this room",
+  readyNotStarted: "Not started", readyAllDone: "Every room you can open is at 100. Try the emergency levels.",
 };
 
 const ht: typeof en = {
@@ -156,6 +170,20 @@ const ht: typeof en = {
   sendLink: "Voye lyen an", resetTitle: "Chwazi yon nouvo modpas",
   newPassword: "Nouvo modpas (8 karaktè oswa plis)", confirmPassword: "Tape l ankò", savePassword: "Sere epi konekte",
   errMatch: "De modpas yo pa menm.", errResetLink: "Lyen sa a pa bon ankò oswa li ekspire. Mande yon lòt.",
+  heroTag: "Gratis pou jwe · Anglè ak Kreyòl",
+  heroTitle: "Èske w ta pare si tout bagay ta chanje?",
+  heroSub: "Mache nan yon bunker 3D, aprann vrè konesans pou ijans epi fè chwa ki pwoteje fanmi w.",
+  heroCta: "Antre nan bunker la", heroClassic: "Ou pito yon vèsyon pi senp? Jwe san 3D",
+  howTitle: "Kijan sa mache",
+  how1: "Eksplore", how1s: "Mache nan bunker la, chanm pa chanm.",
+  how2: "Dekouvri", how2s: "Enspekte chak pwovizyon: sèvi ak li, kite l oswa evite l.",
+  how3: "Aprann", how3s: "Chak repons eksplike poukisa.",
+  how4: "Siviv", how4s: "Fè fas a yon blakawout, yon tanpèt ak yon inondasyon.",
+  missionsTitle: "Misyon w yo",
+  readyTitle: "Pwofil preparasyon m", readyScore: "Nòt konesans preparasyon",
+  readyNote: "Li mezire sa w aprann nan THE BUNKER. Li pa garanti sekirite nan yon vrè ijans.",
+  readyNext: "Pwochen misyon nou rekòmande", readyImprove: "Amelyore nòt ou", readyContinue: "Kòmanse chanm sa a",
+  readyNotStarted: "Poko kòmanse", readyAllDone: "Tout chanm ou ka louvri yo rive 100. Eseye nivo ijans yo.",
 };
 
 export const STRINGS: Record<Lang, typeof en> = { en, ht };

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { track } from "@/lib/track";
 import { stageLength, type Bin, type Room, type RoomAnswers } from "@/lib/rooms/types";
 import PlaceBoard from "./PlaceBoard";
 import { optionOrder } from "@/lib/shuffle";
@@ -46,6 +47,7 @@ export default function RoomGame({ room, reviewed }: { room: Room; reviewed?: { 
       setResult(data.result); // the server's score is the official one
       setNewBadges(Array.isArray(data.newBadges) ? data.newBadges : []);
       setSave("saved");
+      track("finish", room.id, "2d");
     } catch {
       setSave("failed");
     }
@@ -89,7 +91,7 @@ export default function RoomGame({ room, reviewed }: { room: Room; reviewed?: { 
         <div className="hero">{room.emoji}</div>
         <h1>{ui.title}</h1><p>{ui.intro1}</p><p>{ui.intro2}</p>
         {ROOMS_3D.includes(room.id) && <Link className="btn b3-cta" href={`/room/${room.id}/3d`}>{t("play3d")}</Link>}
-        <button className={`btn ${ROOMS_3D.includes(room.id) ? "ghost" : ""}`} onClick={() => setScreen({ kind: "sort", i: 0 })}>{t("start")}</button>
+        <button className={`btn ${ROOMS_3D.includes(room.id) ? "ghost" : ""}`} onClick={() => { track("start", room.id, "2d"); setScreen({ kind: "sort", i: 0 }); }}>{t("start")}</button>
         {reviewed && <p className="reviewed">✅ {t("reviewedBy")} {reviewed.name} · {reviewed.date}</p>}
       </div>
       <p className="note" dangerouslySetInnerHTML={{ __html: t("proto") }} />
