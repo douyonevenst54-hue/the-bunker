@@ -1,5 +1,6 @@
 "use client";
 import ShareButton from "./ShareButton";
+import { track } from "@/lib/track";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Scenario } from "@/lib/scenarios/types";
@@ -35,7 +36,7 @@ export default function ScenarioGame({ sc }: { sc: Scenario }) {
       });
       if (!r.ok) throw new Error();
       const data = await r.json();
-      setResult(data.result); setNewBadges(data.newBadges ?? []); setSave("saved");
+      setResult(data.result); setNewBadges(data.newBadges ?? []); setSave("saved"); track("finish", sc.id, "level");
     } catch { setSave("failed"); }
   }
 
@@ -59,7 +60,7 @@ export default function ScenarioGame({ sc }: { sc: Scenario }) {
       <h1>{sc.title[lang]}</h1>
       {sc.briefing.map((b, i) => <p key={i}>{b[lang]}</p>)}
       {meterBar}
-      <button className="btn" onClick={() => setStep(0)}>{t("start")}</button>
+      <button className="btn" onClick={() => { track("start", sc.id, "level"); setStep(0); }}>{t("start")}</button>
     </div>
   );
 

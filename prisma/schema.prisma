@@ -120,3 +120,21 @@ model AuthAttempt {
 
   @@index([key, createdAt])
 }
+
+/// Funnel events: a visitor started or finished a room / level (anonymous visitor id, no personal data).
+model PlayEvent {
+  id        String   @id @default(cuid())
+  visitor   String
+  playerId  String?
+  /// start | finish
+  kind      String
+  contentId String
+  /// 2d | 3d | level
+  mode      String
+  /// phone | desktop
+  device    String
+  createdAt DateTime @default(now())
+
+  @@index([contentId, kind, createdAt])
+  @@index([visitor, createdAt])
+}

@@ -286,3 +286,35 @@ h3{font-family:Oswald,sans-serif;font-size:18px;margin-bottom:6px}
   .b3-hint{top:44px}
   .b3-joy{width:100px;height:100px;left:16px;bottom:16px}
 }
+/* step 16: admin funnel */
+.funnel-t{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+.funnel-t th,.funnel-t td{text-align:right;padding:6px 4px;border-bottom:1px solid var(--line)}
+.funnel-t th:first-child,.funnel-t td:first-child{text-align:left}
+.funnel-t tr.low td{color:#ff8a7a}
+/* step 16: game-first homepage + readiness profile */
+.hero-card{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#141a24;min-height:440px;display:flex;align-items:flex-end}
+.hero-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;opacity:.55}
+.hero-card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#141a2400 20%,#141a24f2 70%)}
+.hero-body{position:relative;z-index:1;padding:22px 20px 20px;display:flex;flex-direction:column;gap:10px}
+.hero-tag{align-self:flex-start;background:var(--amber);color:#1a1205;font:700 12px Inter;letter-spacing:.06em;text-transform:uppercase;padding:5px 11px;border-radius:999px}
+.hero-body h1{margin:0;font:700 34px/1.05 Oswald,Inter;text-transform:uppercase;letter-spacing:.01em}
+.hero-body p{margin:0;color:#d5dbe4}
+.hero-cta{font-size:17px;padding:15px}
+.hero-classic{color:var(--muted);font-size:13px;text-align:center}
+.how{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:8px}
+.how-step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:3px}
+.how-step span{color:var(--muted);font-size:13px}
+.how-ic{font-size:22px}
+.ready-top{display:flex;gap:16px;align-items:center;margin:8px 0 12px}
+.ready-ring{--p:0;width:92px;height:92px;flex:none;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(closest-side,var(--panel) 78%,transparent 80%),conic-gradient(var(--amber) calc(var(--p)*1%),var(--line) 0)}
+.ready-ring b{font:700 30px Oswald,Inter;line-height:1}
+.ready-ring span{color:var(--muted);font-size:12px}
+.ready-areas{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ready-areas li{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 78px;gap:10px;align-items:center;font-size:14px}
+.ra-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ra-bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.ra-bar i{display:block;height:100%;border-radius:4px}
+.ra-bar i.hi{background:var(--good)}.ra-bar i.mid{background:var(--mid)}.ra-bar i.lo{background:var(--bad)}
+.ra-val{text-align:right;color:var(--muted);font-size:13px}
+.ready-next{margin-top:14px}
+@media (min-width:700px){.how{grid-template-columns:repeat(4,minmax(0,1fr))}.hero-body h1{font-size:44px}}

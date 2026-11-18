@@ -48,3 +48,41 @@ export async function contentStats(): Promise<{ totals: { players: number; regis
   }
   return { totals: { players, registered, attempts }, rows };
 }
+
+export interface FunnelRow { id: string; started: number; finished: number; rate: number | null; threeD: number }
+export interface Funnel {
+  days: number;
+  visitors: number;
+  rows: FunnelRow[];
+  device: { phone: number; desktop: number; phoneFinishRate: number | null; desktopFinishRate: number | null };
+}
+
+const pct = (a: number, b: number) => (b ? Math.round((a / b) * 100) : null);
+
+/** Start → finish funnel from PlayEvent (distinct visitors, last `days` days). */
+export async function funnelStats(days = 30): Promise<Funnel> {
+  const since = new Date(Date.now() - days * 864e5);
+  const [byContent, byMode, byDevice, total] = await Promise.all([
+    prisma.$queryRaw<{ contentId: string; kind: string; n: number }[]>`
+      SELECT "contentId", "kind", COUNT(DISTINCT "visitor")::int AS n FROM "PlayEvent" WHERE "createdAt" > ${since} GROUP BY 1, 2`,
+    prisma.$queryRaw<{ contentId: string; n: number }[]>`
+      SELECT "contentId", COUNT(DISTINCT "visitor")::int AS n FROM "PlayEvent" WHERE "createdAt" > ${since} AND "kind" = 'start' AND "mode" = '3d' GROUP BY 1`,
+    prisma.$queryRaw<{ device: string; kind: string; n: number }[]>`
+      SELECT "device", "kind", COUNT(DISTINCT "visitor")::int AS n FROM "PlayEvent" WHERE "createdAt" > ${since} GROUP BY 1, 2`,
+    prisma.$queryRaw<{ n: number }[]>`SELECT COUNT(DISTINCT "visitor")::int AS n FROM "PlayEvent" WHERE "createdAt" > ${since}`,
+  ]);
+  const get = (id: string, kind: string) => byContent.find((r) => r.contentId === id && r.kind === kind)?.n ?? 0;
+  const rows = [...ROOMS.map((r) => r.id), ...SCENARIOS.map((s) => s.id)].map((id) => {
+    const started = get(id, "start"), finished = get(id, "finish");
+    return { id, started, finished, rate: pct(Math.min(finished, started), started), threeD: byMode.find((r) => r.contentId === id)?.n ?? 0 };
+  });
+  const dev = (d: string, k: string) => byDevice.find((r) => r.device === d && r.kind === k)?.n ?? 0;
+  return {
+    days, visitors: total[0]?.n ?? 0, rows,
+    device: {
+      phone: dev("phone", "start"), desktop: dev("desktop", "start"),
+      phoneFinishRate: pct(Math.min(dev("phone", "finish"), dev("phone", "start")), dev("phone", "start")),
+      desktopFinishRate: pct(Math.min(dev("desktop", "finish"), dev("desktop", "start")), dev("desktop", "start")),
+    },
+  };
+}
