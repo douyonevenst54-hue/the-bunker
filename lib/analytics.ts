@@ -4,6 +4,9 @@ import { ROOMS } from "./rooms";
 import { SCENARIOS } from "./scenarios";
 import { judgePlacement } from "./scoring";
 
+/** emoji prefix for a label; custom icon files (/icons/…) are left out of plain-text labels */
+const em = (e: string) => (e.startsWith("/") ? "" : `${e} `);
+
 export interface Miss { label: string; rate: number; critical: boolean }
 export interface ContentStats {
   id: string; players: number; passed: number; attempts: number; avgBest: number | null; criticalErrors: number; topMisses: Miss[];
@@ -27,10 +30,10 @@ export async function contentStats(): Promise<{ totals: { players: number; regis
       try {
         if (room) {
           const ans = a.answers as { sort: string[]; stages: Record<string, number[]> };
-          room.items.forEach((it, i) => { if (ans.sort[i] !== it.b) bump(`${it.e} ${it.en[0]}`, !!it.critical); });
+          room.items.forEach((it, i) => { if (ans.sort[i] !== it.b) bump(`${em(it.e)}${it.en[0]}`, !!it.critical); });
           for (const S of room.stages) {
             const arr = ans.stages[S.key] ?? [];
-            if (S.kind === "place") S.items.forEach((it, i) => { const j = judgePlacement(S, it, arr[i]); if (j !== "correct") bump(`${it.e} Place: ${it.name.en}`, j === "unsafe"); });
+            if (S.kind === "place") S.items.forEach((it, i) => { const j = judgePlacement(S, it, arr[i]); if (j !== "correct") bump(`${em(it.e)}Place: ${it.name.en}`, j === "unsafe"); });
             else S.qs.forEach((q, i) => { if (arr[i] !== q.a) bump(q.en.q, !!q.critical); });
           }
         } else if (sc) {
