@@ -7,6 +7,8 @@ import { asLang, LANG_COOKIE, STRINGS } from "@/lib/i18n";
 import { getPlayer } from "@/lib/session";
 import { isAdmin } from "@/lib/admin";
 import { Analytics } from "@vercel/analytics/next";
+import { isPiEdition } from "@/lib/edition";
+import PiAuth from "@/components/PiAuth";
 
 const DESC = "An emergency-preparedness game for families, in English and Haitian Creole. Free to start. Built by Dr. Jhon Evenst Douyon, MD, MPH.";
 export const metadata: Metadata = {
@@ -23,11 +25,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const lang = asLang((await cookies()).get(LANG_COOKIE)?.value);
   const player = await getPlayer().catch(() => null);
   const s = STRINGS[lang];
+  const pi = await isPiEdition();
   return (
     <html lang={lang}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        {pi && <script src="https://sdk.minepi.com/pi-sdk.js" async />}
       </head>
       <body>
         <LangProvider initial={lang}>
@@ -36,7 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <div className="brand"><Link href="/">THE <span>BUNKER</span></Link></div>
               <div className="right">
                 {isAdmin(player) && <Link className="acct" href="/admin">{s.admin}</Link>}
-                <Link className="acct" href="/account">{player?.email ? "👤" : s.account}</Link>
+                {pi ? <PiAuth username={player?.piUsername ?? null} /> : <Link className="acct" href="/account">{player?.email ? "👤" : s.account}</Link>}
                 <LangToggle />
               </div>
             </header>

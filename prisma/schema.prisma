@@ -22,6 +22,12 @@ model Player {
   stripeCustomerId String?    @unique
   /// Public share page /p/<shareCode>; null = not shared.
   shareCode    String?        @unique
+  /// Pi Network identity (Pi edition). Set only from a token verified with Pi's /v2/me.
+  piUid        String?        @unique
+  piUsername   String?
+  /// Set when this Pioneer completed the optional Pi supporter payment.
+  piSupporterAt DateTime?
+  piPayments   PiPayment[]
   subStatus    String?
   subInterval  String?
   subPeriodEnd DateTime?
@@ -137,4 +143,22 @@ model PlayEvent {
 
   @@index([contentId, kind, createdAt])
   @@index([visitor, createdAt])
+}
+
+/// Pi Network payments (Pi edition). Mirrors Pi's own record; the server approves and completes them.
+model PiPayment {
+  id        String   @id @default(cuid())
+  paymentId String   @unique
+  playerId  String?
+  player    Player?  @relation(fields: [playerId], references: [id], onDelete: SetNull)
+  piUid     String
+  amount    Float
+  kind      String
+  /// approved | completed | cancelled
+  status    String
+  txid      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([playerId])
 }

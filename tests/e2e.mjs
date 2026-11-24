@@ -9,12 +9,14 @@ const ok = (cond, msg) => { console.log(`${cond ? "PASS" : "FAIL"}  ${msg}`); if
 
 class Client {
   cookies = new Map();
+  constructor(base = BASE) { this.base = base; }
   async req(path, { method = "GET", body } = {}) {
-    const res = await fetch(BASE + path, {
+    const res = await fetch(this.base + path, {
       method, redirect: "manual",
       headers: { ...(body ? { "Content-Type": "application/json" } : {}), Cookie: [...this.cookies].map(([k, v]) => `${k}=${v}`).join("; ") },
       body: body ? JSON.stringify(body) : undefined,
     });
+    this.lastSetCookie = (res.headers.getSetCookie?.() ?? []).join("\n");
     for (const c of res.headers.getSetCookie?.() ?? []) {
       const [kv] = c.split(";"); const i = kv.indexOf("=");
       const k = kv.slice(0, i), v = kv.slice(i + 1);
@@ -22,7 +24,7 @@ class Client {
     }
     const text = await res.text();
     let json; try { json = JSON.parse(text); } catch {}
-    return { status: res.status, text, json, location: res.headers.get("location") };
+    return { status: res.status, text, json, location: res.headers.get("location"), headers: res.headers };
   }
 }
 
@@ -314,6 +316,56 @@ ok(Number(sql("select count(*) from \\\"PasswordResetToken\\\" where \\\"created
 
 r = await g2.req("/api/auth/logout", { method: "POST" });
 ok(!g2.cookies.has("bunker_session"), "logout clears the session");
+
+// ---------- Step 17: Pi edition (pi.buildthebunker.com; 127.0.0.1 stands in for it here) ----------
+{
+  const PI = BASE.replace("localhost", "127.0.0.1");
+  const seed = (p) => fetch("http://localhost:3999/__seed", { method: "POST", body: JSON.stringify(p) });
+  const main = await new Client().req("/");
+  const piHome = await new Client(PI).req("/");
+  ok(main.headers.get("x-frame-options") === "DENY" && !main.text.includes("pi-sdk.js"), "main site can't be framed and doesn't load the Pi SDK");
+  ok(!piHome.headers.get("x-frame-options") && /frame-ancestors[^;]*minepi\.com[^;]*pinet\.com/.test(piHome.headers.get("content-security-policy") ?? "") && piHome.text.includes("sdk.minepi.com/pi-sdk.js"),
+    "Pi edition loads the Pi SDK and may be framed only by Pi's sites");
+  ok((await new Client().req("/api/auth/pi", { method: "POST", body: { accessToken: "pi-good-u1" } })).status === 404, "Pi sign-in is off on the main site");
+
+  const pc = new Client(PI);
+  await pc.req("/api/rooms/water/complete", { method: "POST", body: { answers: perfect(water) } });
+  const medicalRoom = ROOMS.find((x) => x.id === "medical");
+  await pc.req("/api/rooms/medical/complete", { method: "POST", body: { answers: perfect(medicalRoom) } });
+  const guestId = sql(`select \\"id\\" from \\"Player\\" order by \\"createdAt\\" desc limit 1`).trim();
+  ok((await pc.req("/api/auth/pi", { method: "POST", body: { accessToken: "forged" } })).status === 401, "Pi sign-in rejects a token Pi doesn't confirm");
+  r = await pc.req("/api/auth/pi", { method: "POST", body: { accessToken: "pi-good-u1" } });
+  ok(r.status === 200 && r.json?.username === "pioneer_u1", "Pi sign-in works with a token Pi confirms");
+  ok(/SameSite=None/i.test(pc.lastSetCookie) && /Partitioned/i.test(pc.lastSetCookie) && /Secure/i.test(pc.lastSetCookie), "Pi session cookie works inside Pi's frame (SameSite=None; Secure; Partitioned)");
+  ok(sql(`select \\"id\\" from \\"Player\\" where \\"piUid\\" = 'u1'`).trim() === guestId, "signing in with Pi keeps this device's guest progress");
+  await new Client(PI).req("/api/auth/pi", { method: "POST", body: { accessToken: "pi-good-u1" } });
+  ok(sql(`select count(*) from \\"Player\\" where \\"piUid\\" = 'u1'`).trim() === "1", "signing in again doesn't create a second player");
+  r = await pc.req("/room/security");
+  ok(r.status === 200, "Pioneers play members-only rooms free");
+  ok((await new Client(PI).req("/room/security")).status === 307, "Pi guests still need to sign in for members-only rooms");
+  ok((await pc.req("/api/billing/checkout", { method: "POST", body: {} })).status === 404, "no Stripe checkout in the Pi edition");
+  r = await pc.req("/upgrade");
+  ok(r.text.includes("Every room is free for Pioneers") && r.text.includes("Support THE BUNKER with 1 π"), "Pi upgrade page offers free access and optional support in Pi");
+
+  await seed({ identifier: "pay_test_001", user_uid: "u1", amount: 1, metadata: { kind: "supporter" } });
+  await seed({ identifier: "pay_test_002", user_uid: "u2", amount: 1, metadata: { kind: "supporter" } });
+  await seed({ identifier: "pay_test_003", user_uid: "u1", amount: 5, metadata: { kind: "supporter" } });
+  ok((await pc.req("/api/pi/payments", { method: "POST", body: { action: "approve", paymentId: "pay_test_002" } })).status === 403, "can't approve another Pioneer's payment");
+  ok((await pc.req("/api/pi/payments", { method: "POST", body: { action: "approve", paymentId: "pay_test_003" } })).status === 400, "payment for the wrong amount is refused");
+  ok((await new Client(PI).req("/api/pi/payments", { method: "POST", body: { action: "approve", paymentId: "pay_test_001" } })).status === 401, "approving needs Pi sign-in");
+  r = await pc.req("/api/pi/payments", { method: "POST", body: { action: "approve", paymentId: "pay_test_001" } });
+  ok(r.status === 200, "own supporter payment is approved");
+  r = await pc.req("/api/pi/payments", { method: "POST", body: { action: "complete", paymentId: "pay_test_001", txid: "tx_abc" } });
+  ok(r.status === 200 && sql(`select \\"status\\" from \\"PiPayment\\" where \\"paymentId\\" = 'pay_test_001'`).trim() === "completed"
+    && sql(`select count(*) from \\"Player\\" where \\"piUid\\" = 'u1' and \\"piSupporterAt\\" is not null`).trim() === "1", "completed payment is recorded and gives the supporter badge");
+  ok((await pc.req("/upgrade")).text.includes("Thank you for supporting"), "supporters are thanked");
+  await seed({ identifier: "pay_test_004", user_uid: "u1", amount: 1, metadata: { kind: "supporter" }, transaction: { txid: "tx_4" } });
+  await seed({ identifier: "pay_test_005", user_uid: "u1", amount: 1, metadata: { kind: "supporter" } });
+  r = await new Client(PI).req("/api/pi/payments", { method: "POST", body: { action: "recover", paymentId: "pay_test_004" } });
+  ok(r.json?.state === "completed", "an interrupted payment that was paid is completed at the next sign-in");
+  r = await new Client(PI).req("/api/pi/payments", { method: "POST", body: { action: "recover", paymentId: "pay_test_005" } });
+  ok(r.json?.state === "cancelled", "an interrupted unpaid payment is cancelled so it can't block the Pioneer");
+}
 
 console.log(failures ? `\n${failures} FAILED` : "\nALL PASSED");
 process.exit(failures ? 1 : 0);

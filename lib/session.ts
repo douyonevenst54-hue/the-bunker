@@ -2,6 +2,7 @@ import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { prisma, dbEnabled } from "./db";
+import { isPiEdition } from "./edition";
 
 const COOKIE = "bunker_session";
 const MAX_AGE = 60 * 60 * 24 * 365; // 1 year
@@ -18,10 +19,14 @@ export async function setSession(playerId: string) {
     .setIssuedAt()
     .setExpirationTime(`${MAX_AGE}s`)
     .sign(key());
+  // The Pi Browser sandbox and PiNet show the app inside a frame, where a "lax"
+  // cookie is never sent. There the session cookie is cross-site and partitioned.
+  const pi = await isPiEdition();
   (await cookies()).set(COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: pi || process.env.NODE_ENV === "production",
+    sameSite: pi ? "none" : "lax",
+    ...(pi ? { partitioned: true } : {}),
     path: "/",
     maxAge: MAX_AGE,
   });

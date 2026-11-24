@@ -92,6 +92,13 @@ const en = {
   readyNote: "Measures what you've learned in THE BUNKER. It does not guarantee safety in a real emergency.",
   readyNext: "Recommended next mission", readyImprove: "Improve your score", readyContinue: "Start this room",
   readyNotStarted: "Not started", readyAllDone: "Every room you can open is at 100. Try the emergency levels.",
+  piEdition: "Pi edition", piSignedIn: "Signed in with Pi", piBrowserOnly: "Open in Pi Browser", piFailed: "Pi sign-in failed",
+  piOpenInBrowser: "Open this page in the Pi Browser to sign in with Pi.",
+  piGuestNote: "Open THE BUNKER in the Pi Browser and sign in with Pi to save your progress and unlock every room, free.",
+  piUnlockTitle: "Every room is free for Pioneers", piUnlockBody: "Sign in with Pi and all six rooms and the three emergency levels open. Nothing to buy.",
+  piBrowserOnlyLong: "Pi sign-in works inside the Pi Browser. Open pi.buildthebunker.com there to unlock everything.",
+  piSupport: "Support THE BUNKER with {n} π", piSupportNote: "Optional. You get a supporter badge; the game stays the same for everyone.",
+  piThanks: "Thank you for supporting THE BUNKER!", piPayError: "The payment didn't go through. Nothing was charged; try again later.",
 };
 
 const ht: typeof en = {
@@ -184,6 +191,13 @@ const ht: typeof en = {
   readyNote: "Li mezire sa w aprann nan THE BUNKER. Li pa garanti sekirite nan yon vrè ijans.",
   readyNext: "Pwochen misyon nou rekòmande", readyImprove: "Amelyore nòt ou", readyContinue: "Kòmanse chanm sa a",
   readyNotStarted: "Poko kòmanse", readyAllDone: "Tout chanm ou ka louvri yo rive 100. Eseye nivo ijans yo.",
+  piEdition: "Edisyon Pi", piSignedIn: "Konekte ak Pi", piBrowserOnly: "Louvri nan Pi Browser", piFailed: "Koneksyon Pi a pa mache",
+  piOpenInBrowser: "Louvri paj sa a nan Pi Browser pou w konekte ak Pi.",
+  piGuestNote: "Louvri THE BUNKER nan Pi Browser epi konekte ak Pi pou sove pwogrè w epi louvri tout chanm yo, gratis.",
+  piUnlockTitle: "Tout chanm yo gratis pou Pionye yo", piUnlockBody: "Konekte ak Pi epi sis chanm yo ak twa nivo ijans yo ap louvri. Pa gen anyen pou achte.",
+  piBrowserOnlyLong: "Koneksyon Pi mache sèlman nan Pi Browser. Louvri pi.buildthebunker.com la pou debloke tout bagay.",
+  piSupport: "Sipòte THE BUNKER ak {n} π", piSupportNote: "Si w vle sèlman. W ap jwenn yon badj sipòtè; jwèt la rete menm jan pou tout moun.",
+  piThanks: "Mèsi paske w sipòte THE BUNKER!", piPayError: "Peman an pa pase. Yo pa retire anyen; eseye ankò pita.",
 };
 
 export const STRINGS: Record<Lang, typeof en> = { en, ht };

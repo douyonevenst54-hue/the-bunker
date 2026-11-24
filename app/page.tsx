@@ -10,6 +10,7 @@ import ShareButton from "@/components/ShareButton";
 import { needsPlan, paywallOn, isMember } from "@/lib/plan";
 import BadgeShelf from "@/components/BadgeShelf";
 import { readiness } from "@/lib/readiness";
+import { isPiEdition } from "@/lib/edition";
 import { ROOMS_3D } from "@/lib/rooms/three-d";
 
 export const dynamic = "force-dynamic";
@@ -26,6 +27,7 @@ export default async function Bunker() {
   const total = ROOMS.length + COMING_SOON.length;
   const passed = statuses.filter((r) => r.passed).length;
   const premium = ROOMS.map((r) => r.id).filter((id) => needsPlan(id, player));
+  const pi = await isPiEdition();
   const showUpgrade = paywallOn() && !isMember(player);
   const returning = statuses.some((r) => r.played);
   const ready = readiness(statuses, premium);
@@ -134,7 +136,11 @@ export default async function Bunker() {
 
       <BadgeShelf lang={lang} earned={badges} />
 
-      {!player?.email && (
+      {pi ? (!player?.piUid && (
+        <div className="card" style={{ marginTop: 14 }}>
+          <p>π {s.piGuestNote}</p>
+        </div>
+      )) : !player?.email && (
         <div className="card" style={{ marginTop: 14 }}>
           <p>{s.guestNote}</p>
           <Link className="btn" href="/account">{s.createAccount}</Link>
