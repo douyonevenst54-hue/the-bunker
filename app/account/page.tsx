@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { getPlayer } from "@/lib/session";
+import { isPiEdition } from "@/lib/edition";
 import { asLang, LANG_COOKIE, STRINGS } from "@/lib/i18n";
 import { isMember, paywallOn } from "@/lib/plan";
 import AccountForms from "@/components/AccountForms";
@@ -10,6 +12,7 @@ import StopSharing from "@/components/StopSharing";
 export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
+  if (await isPiEdition()) redirect("/"); // Pi edition: Pi sign-in only
   const player = await getPlayer().catch(() => null);
   const s = STRINGS[asLang((await cookies()).get(LANG_COOKIE)?.value)];
   const member = isMember(player);

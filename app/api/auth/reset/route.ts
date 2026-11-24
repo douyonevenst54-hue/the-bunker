@@ -1,3 +1,4 @@
+import { isPiEdition } from "@/lib/edition";
 import { NextResponse } from "next/server";
 import { createHash } from "node:crypto";
 import bcrypt from "bcryptjs";
@@ -5,6 +6,7 @@ import { prisma, dbEnabled } from "@/lib/db";
 import { setSession } from "@/lib/session";
 
 export async function POST(req: Request) {
+  if (await isPiEdition()) return NextResponse.json({ error: "piOnly" }, { status: 404 }); // Pi edition: Pi sign-in only
   if (!dbEnabled) return NextResponse.json({ error: "errServer" }, { status: 503 });
   const body = await req.json().catch(() => ({}));
   const token = typeof body.token === "string" ? body.token : "";

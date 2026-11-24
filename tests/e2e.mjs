@@ -345,6 +345,12 @@ ok(!g2.cookies.has("bunker_session"), "logout clears the session");
   ok(sql(`select count(*) from \\"Player\\" where \\"piUid\\" = 'u1'`).trim() === "1", "signing in again doesn't create a second player");
   r = await pc.req("/room/security");
   ok(r.status === 307 && r.location?.endsWith("/upgrade"), "Pi edition: room 3 needs the Bunker Pass");
+  {
+    const g = new Client(PI);
+    ok((await g.req("/api/auth/register", { method: "POST", body: { email: "pi-x@example.com", password: "longpassword1" } })).status === 404, "Pi edition: email sign-up is off (Pi sign-in only)");
+    ok((await g.req("/api/auth/login", { method: "POST", body: { email: "pi-x@example.com", password: "longpassword1" } })).status === 404, "Pi edition: email login is off");
+    ok((await g.req("/account")).status === 307, "Pi edition: the email account page redirects home");
+  }
   ok((await pc.req("/api/billing/checkout", { method: "POST", body: {} })).status === 404, "no Stripe checkout in the Pi edition");
   r = await pc.req("/upgrade");
   ok(r.text.includes("Get the Bunker Pass · 4 π / 30 days") && r.text.includes("Support THE BUNKER with 1 π"), "Pi upgrade page sells the 4 π Bunker Pass and optional support");

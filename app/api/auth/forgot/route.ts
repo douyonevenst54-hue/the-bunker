@@ -1,3 +1,4 @@
+import { isPiEdition } from "@/lib/edition";
 import { NextResponse } from "next/server";
 import { createHash, randomBytes } from "node:crypto";
 import { prisma, dbEnabled } from "@/lib/db";
@@ -12,6 +13,7 @@ const MAX_PER_HOUR = 3;
  * which emails have accounts.
  */
 export async function POST(req: Request) {
+  if (await isPiEdition()) return NextResponse.json({ error: "piOnly" }, { status: 404 }); // Pi edition: Pi sign-in only
   if (!dbEnabled) return NextResponse.json({ error: "errServer" }, { status: 503 });
   const body = await req.json().catch(() => ({}));
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
