@@ -34,6 +34,14 @@ export default function Terms() {
         <li>Refunds: if something went wrong, email <a href={`mailto:${CONTACT}`}>{CONTACT}</a> within 14 days of a charge and we will make it right.</li>
       </ul>
 
+      <h2>4a. Pi edition (pi.buildthebunker.com)</h2>
+      <ul>
+        <li>In the Pi Browser, players who sign in with Pi can play every room and level free. Pi Network is a separate service with its own terms.</li>
+        <li>Supporting THE BUNKER in Pi is optional. It gives a supporter badge and never changes the gameplay.</li>
+        <li>A Pi payment is confirmed on the Pi blockchain and we cannot reverse it there. If something went wrong, email <a href={`mailto:${CONTACT}`}>{CONTACT}</a> and we will look into it.</li>
+        <li>We never ask for your wallet passphrase. Anyone who does is not us.</li>
+      </ul>
+
       <h2>5. Sharing</h2>
       <p>If you share your progress page, you choose to make your first name, rooms, levels and badges public to anyone with the link. You can stop sharing any time.</p>
 
