@@ -1,3 +1,4 @@
+import { isPiEdition } from "@/lib/edition";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma, dbEnabled } from "@/lib/db";
@@ -6,6 +7,7 @@ import { checkCredentials } from "@/lib/auth-input";
 
 /** Creates an account. If the visitor was playing as a guest, that guest becomes the account (progress kept). */
 export async function POST(req: Request) {
+  if (await isPiEdition()) return NextResponse.json({ error: "piOnly" }, { status: 404 }); // Pi edition: Pi sign-in only
   if (!dbEnabled) return NextResponse.json({ error: "errServer" }, { status: 503 });
   const body = await req.json().catch(() => ({}));
   const check = checkCredentials(body);
