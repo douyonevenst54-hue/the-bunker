@@ -327,6 +327,9 @@ ok(!g2.cookies.has("bunker_session"), "logout clears the session");
   ok(!piHome.headers.get("x-frame-options") && /frame-ancestors[^;]*minepi\.com[^;]*pinet\.com/.test(piHome.headers.get("content-security-policy") ?? "") && piHome.text.includes("sdk.minepi.com/pi-sdk.js"),
     "Pi edition loads the Pi SDK and may be framed only by Pi's sites");
   ok((await new Client().req("/api/auth/pi", { method: "POST", body: { accessToken: "pi-good-u1" } })).status === 404, "Pi sign-in is off on the main site");
+  r = await new Client(PI).req("/validation-key.txt");
+  ok(r.status === 200 && r.text === "test-validation-key", "Pi domain-verification file is served on the Pi edition");
+  ok((await new Client().req("/validation-key.txt")).status === 404, "no Pi verification file on the main site");
 
   const pc = new Client(PI);
   await pc.req("/api/rooms/water/complete", { method: "POST", body: { answers: perfect(water) } });
