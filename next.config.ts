@@ -7,7 +7,7 @@ const security = [
 ];
 
 // The Pi edition is shown inside the Pi Browser sandbox and PiNet, so it may be framed by Pi's sites only.
-const piHosts = (process.env.PI_HOSTS ?? "pi.buildthebunker.com").split(",").map((h) => h.trim()).filter(Boolean);
+const piHosts = (process.env.PI_HOSTS ?? "pi.buildthebunker.com,testnet.buildthebunker.com").split(",").map((h) => h.trim()).filter(Boolean);
 const piHostRe = `(${piHosts.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`;
 const PI_FRAMERS = "frame-ancestors 'self' https://*.minepi.com https://*.pinet.com https://*.pi.app https://sandbox.minepi.com";
 

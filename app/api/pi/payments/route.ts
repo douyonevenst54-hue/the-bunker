@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma, dbEnabled } from "@/lib/db";
 import { getPlayer } from "@/lib/session";
-import { isPiEdition } from "@/lib/edition";
+import { isPiEdition, piApiKey } from "@/lib/edition";
 
 const PI_API = process.env.PI_API_BASE ?? "https://api.minepi.com";
 import { SUPPORT_AMOUNT } from "@/lib/pi";
@@ -14,7 +14,7 @@ type PiPaymentDTO = {
 };
 
 async function pi(path: string, body?: unknown) {
-  const key = process.env.PI_API_KEY;
+  const key = await piApiKey();
   if (!key) throw new Error("PI_API_KEY missing");
   const r = await fetch(`${PI_API}/v2/payments/${path}`, {
     method: body === undefined ? "GET" : "POST",
