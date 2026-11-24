@@ -4,6 +4,9 @@ import { asLang, LANG_COOKIE, STRINGS } from "@/lib/i18n";
 import { getPlayer } from "@/lib/session";
 import { billingReady, isMember } from "@/lib/plan";
 import BillingButtons from "@/components/BillingButtons";
+import PiSupport from "@/components/PiSupport";
+import { isPiEdition } from "@/lib/edition";
+import { SUPPORT_AMOUNT } from "@/lib/pi";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +16,21 @@ export default async function UpgradePage({ searchParams }: { searchParams: Prom
   const { ok } = await searchParams;
   const player = await getPlayer().catch(() => null);
   const member = isMember(player);
+  if (await isPiEdition()) {
+    // Pi edition: no Stripe. Signing in with Pi unlocks every room; supporting in Pi is optional.
+    return (
+      <div className="card upgrade">
+        <div className="stage">π {s.piEdition}</div>
+        <h1>{s.piUnlockTitle}</h1>
+        <p>{s.piUnlockBody}</p>
+        {player?.piUid ? (<>
+          <p className="ok-msg">✅ {s.isMemberMsg}</p>
+          <PiSupport amount={SUPPORT_AMOUNT} supporter={!!player.piSupporterAt} />
+          <Link className="btn" href="/">{s.backToBunker}</Link>
+        </>) : <p className="note">{s.piBrowserOnlyLong}</p>}
+      </div>
+    );
+  }
   return (
     <div className="card upgrade">
       <div className="stage">💎 {s.membership}</div>

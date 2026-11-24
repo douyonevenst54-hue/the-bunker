@@ -318,3 +318,6 @@ h3{font-family:Oswald,sans-serif;font-size:18px;margin-bottom:6px}
 .ra-val{text-align:right;color:var(--muted);font-size:13px}
 .ready-next{margin-top:14px}
 @media (min-width:700px){.how{grid-template-columns:repeat(4,minmax(0,1fr))}.hero-body h1{font-size:44px}}
+/* step 17: Pi edition */
+.pi-badge{font:600 13px Inter;color:#1a1205;background:var(--amber);border-radius:999px;padding:4px 10px;white-space:nowrap;max-width:46vw;overflow:hidden;text-overflow:ellipsis}
+.pi-badge.off{background:transparent;color:var(--muted);border:1px solid var(--line)}

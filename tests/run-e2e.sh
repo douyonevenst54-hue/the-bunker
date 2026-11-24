@@ -4,6 +4,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 : "${DATABASE_URL:?set DATABASE_URL}"
+# 127.0.0.1 stands in for pi.buildthebunker.com (needed at build time too: next.config sets the framing headers)
+export PI_HOSTS="pi.buildthebunker.com,127.0.0.1"
 export AUTH_SECRET="${AUTH_SECRET:-test-secret-test-secret-test-secret-1234}"
 
 npx prisma migrate deploy
@@ -12,7 +14,8 @@ npm run build
 npx -y esbuild@0.25 lib/rooms/index.ts --bundle --format=esm --platform=node --outfile=.test-build/rooms.mjs --log-level=warning
 npx -y esbuild@0.25 lib/scenarios/index.ts --bundle --format=esm --platform=node --outfile=.test-build/scenarios.mjs --log-level=warning
 
-PAYWALL=on STRIPE_WEBHOOK_SECRET=whsec_test_bunker ADMIN_EMAILS=admin@example.com EMAIL_DEV_LOG=1 APP_URL=http://localhost:3000 RESEND_API_KEY= PORT=3000 npm start > /tmp/next.log 2>&1 &
+node tests/pi-mock.mjs > /tmp/pimock.log 2>&1 &
+PI_HOSTS=pi.buildthebunker.com,127.0.0.1 PI_API_BASE=http://localhost:3999 PI_API_KEY=test-pi-key PAYWALL=on STRIPE_WEBHOOK_SECRET=whsec_test_bunker ADMIN_EMAILS=admin@example.com EMAIL_DEV_LOG=1 APP_URL=http://localhost:3000 RESEND_API_KEY= PORT=3000 npm start > /tmp/next.log 2>&1 &
 SERVER=$!
 trap 'kill $SERVER 2>/dev/null || true' EXIT
 for i in $(seq 1 60); do curl -sf http://localhost:3000/ >/dev/null && break; sleep 1; done

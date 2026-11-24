@@ -23,6 +23,8 @@ export default function Privacy() {
       <ul>
         <li><b>Playing as a guest:</b> a random ID in a cookie, and your answers, scores and badges. No name or email.</li>
         <li><b>With an account:</b> your email, an optional first name, and a securely hashed password (we never store the password itself).</li>
+        <li><b>Pi edition (pi.buildthebunker.com):</b> when you sign in with Pi, we receive your Pi username and a Pi user ID from Pi Network, nothing else.
+          We do not ask for your wallet address and never ask for your passphrase. If you choose to support the game in Pi, we keep the payment ID, amount and transaction ID.</li>
         <li><b>Membership:</b> Stripe processes payments. We receive your Stripe customer ID and subscription status, never your card number.</li>
         <li><b>Emails:</b> we send password-reset emails through Resend.</li>
         <li><b>Usage statistics:</b> anonymous, cookie-free page-visit counts (Vercel Web Analytics).</li>
@@ -46,7 +48,7 @@ export default function Privacy() {
         If you believe a child under 13 gave us personal information, contact us and we will delete it.</p>
 
       <h2>Who processes data for us</h2>
-      <p>Vercel (hosting and analytics), Neon (database), Stripe (payments), Resend (email). Each handles data only to provide its service.</p>
+      <p>Vercel (hosting and analytics), Neon (database), Stripe (payments), Pi Network (sign-in and Pi payments in the Pi edition), Resend (email). Each handles data only to provide its service.</p>
 
       <h2>Keeping and deleting data</h2>
       <p>We keep account data while your account is active. To get a copy of your data or delete your account, email <a href={`mailto:${CONTACT}`}>{CONTACT}</a>.
