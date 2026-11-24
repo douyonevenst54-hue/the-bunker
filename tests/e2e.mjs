@@ -344,11 +344,23 @@ ok(!g2.cookies.has("bunker_session"), "logout clears the session");
   await new Client(PI).req("/api/auth/pi", { method: "POST", body: { accessToken: "pi-good-u1" } });
   ok(sql(`select count(*) from \\"Player\\" where \\"piUid\\" = 'u1'`).trim() === "1", "signing in again doesn't create a second player");
   r = await pc.req("/room/security");
-  ok(r.status === 200, "Pioneers play members-only rooms free");
-  ok((await new Client(PI).req("/room/security")).status === 307, "Pi guests still need to sign in for members-only rooms");
+  ok(r.status === 307 && r.location?.endsWith("/upgrade"), "Pi edition: room 3 needs the Bunker Pass");
   ok((await pc.req("/api/billing/checkout", { method: "POST", body: {} })).status === 404, "no Stripe checkout in the Pi edition");
   r = await pc.req("/upgrade");
-  ok(r.text.includes("Every room is free for Pioneers") && r.text.includes("Support THE BUNKER with 1 π"), "Pi upgrade page offers free access and optional support in Pi");
+  ok(r.text.includes("Get the Bunker Pass · 4 π / 30 days") && r.text.includes("Support THE BUNKER with 1 π"), "Pi upgrade page sells the 4 π Bunker Pass and optional support");
+
+  await seed({ identifier: "pay_pass_001", user_uid: "u1", amount: 4, metadata: { kind: "pass30" } });
+  await seed({ identifier: "pay_pass_cheap", user_uid: "u1", amount: 1, metadata: { kind: "pass30" } });
+  ok((await pc.req("/api/pi/payments", { method: "POST", body: { action: "approve", paymentId: "pay_pass_cheap" } })).status === 400, "a Bunker Pass for less than 4 π is refused");
+  ok((await pc.req("/api/pi/payments", { method: "POST", body: { action: "approve", paymentId: "pay_pass_001" } })).status === 200, "Bunker Pass payment approved");
+  ok((await pc.req("/api/pi/payments", { method: "POST", body: { action: "complete", paymentId: "pay_pass_001", txid: "tx_pass" } })).status === 200, "Bunker Pass payment completed");
+  const days = () => Number(sql(`select round(extract(epoch from (\\"piPassUntil\\" - now())) / 86400) from \\"Player\\" where \\"piUid\\" = 'u1'`));
+  ok(days() === 30, "Bunker Pass runs for 30 days");
+  await pc.req("/api/pi/payments", { method: "POST", body: { action: "complete", paymentId: "pay_pass_001", txid: "tx_pass" } });
+  ok(days() === 30, "completing the same payment twice doesn't add days");
+  ok((await pc.req("/room/security")).status === 200, "with the Bunker Pass, room 3 opens");
+  r = await pc.req("/upgrade");
+  ok(r.text.includes("Your Bunker Pass is active until") && r.text.includes("Add 30 more days · 4 π"), "upgrade page shows the pass end date and renewal");
 
   await seed({ identifier: "pay_test_001", user_uid: "u1", amount: 1, metadata: { kind: "supporter" } });
   await seed({ identifier: "pay_test_002", user_uid: "u2", amount: 1, metadata: { kind: "supporter" } });

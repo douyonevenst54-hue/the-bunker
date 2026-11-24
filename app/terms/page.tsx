@@ -36,7 +36,7 @@ export default function Terms() {
 
       <h2>4a. Pi edition (pi.buildthebunker.com)</h2>
       <ul>
-        <li>In the Pi Browser, players who sign in with Pi can play every room and level free. Pi Network is a separate service with its own terms.</li>
+        <li>In the Pi Browser, rooms 1 and 2 are free. The Bunker Pass, paid once in Pi, opens rooms 3 to 6 and the emergency levels for 30 days and does not renew by itself. Pi Network is a separate service with its own terms.</li>
         <li>Supporting THE BUNKER in Pi is optional. It gives a supporter badge and never changes the gameplay.</li>
         <li>A Pi payment is confirmed on the Pi blockchain and we cannot reverse it there. If something went wrong, email <a href={`mailto:${CONTACT}`}>{CONTACT}</a> and we will look into it.</li>
         <li>We never ask for your wallet passphrase. Anyone who does is not us.</li>

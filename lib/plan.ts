@@ -4,7 +4,7 @@ import { isAdmin } from "./admin";
 /** Rooms anyone can play. Everything else (rooms 3–6 and every level) is for members. */
 export const FREE_ROOMS = ["water", "medical"];
 
-type PlanPlayer = { email: string | null; role: string; subStatus?: string | null; piUid?: string | null } | null | undefined;
+type PlanPlayer = { email: string | null; role: string; subStatus?: string | null; piPassUntil?: Date | null } | null | undefined;
 
 /** Stripe keys and both prices are configured. */
 export function billingReady(): boolean {
@@ -19,8 +19,8 @@ export function paywallOn(): boolean {
 export function isMember(p: PlanPlayer): boolean {
   if (!p) return false;
   if (isAdmin(p as { email: string | null; role: string })) return true;
-  // Pi edition: every room is free for players signed in with Pi.
-  if (p.piUid) return true;
+  // Pi edition: an active Bunker Pass, paid in Pi.
+  if (p.piPassUntil && p.piPassUntil > new Date()) return true;
   return p.subStatus === "active" || p.subStatus === "trialing";
 }
 

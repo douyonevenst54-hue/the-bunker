@@ -27,6 +27,8 @@ model Player {
   piUsername   String?
   /// Set when this Pioneer completed the optional Pi supporter payment.
   piSupporterAt DateTime?
+  /// Bunker Pass (Pi edition): rooms 3–6 and the levels are open until this date.
+  piPassUntil  DateTime?
   piPayments   PiPayment[]
   subStatus    String?
   subInterval  String?

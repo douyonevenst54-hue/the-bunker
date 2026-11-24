@@ -4,9 +4,9 @@ import { asLang, LANG_COOKIE, STRINGS } from "@/lib/i18n";
 import { getPlayer } from "@/lib/session";
 import { billingReady, isMember } from "@/lib/plan";
 import BillingButtons from "@/components/BillingButtons";
-import PiSupport from "@/components/PiSupport";
+import PiPay from "@/components/PiPay";
 import { isPiEdition } from "@/lib/edition";
-import { SUPPORT_AMOUNT } from "@/lib/pi";
+import { SUPPORT_AMOUNT, PASS_AMOUNT } from "@/lib/pi";
 
 export const dynamic = "force-dynamic";
 
@@ -17,17 +17,27 @@ export default async function UpgradePage({ searchParams }: { searchParams: Prom
   const player = await getPlayer().catch(() => null);
   const member = isMember(player);
   if (await isPiEdition()) {
-    // Pi edition: no Stripe. Signing in with Pi unlocks every room; supporting in Pi is optional.
+    // Pi edition: no Stripe. Rooms 1–2 free; the Bunker Pass (paid in Pi) opens the rest for 30 days.
+    const until = player?.piPassUntil && player.piPassUntil > new Date() ? player.piPassUntil : null;
+    const day = until ? until.toLocaleDateString(lang === "ht" ? "fr-HT" : "en-US", { year: "numeric", month: "long", day: "numeric" }) : "";
+    const n = String(PASS_AMOUNT);
     return (
       <div className="card upgrade">
         <div className="stage">π {s.piEdition}</div>
-        <h1>{s.piUnlockTitle}</h1>
-        <p>{s.piUnlockBody}</p>
-        {player?.piUid ? (<>
-          <p className="ok-msg">✅ {s.isMemberMsg}</p>
-          <PiSupport amount={SUPPORT_AMOUNT} supporter={!!player.piSupporterAt} />
-          <Link className="btn" href="/">{s.backToBunker}</Link>
-        </>) : <p className="note">{s.piBrowserOnlyLong}</p>}
+        <h1>{s.piPassTitle}</h1>
+        <p>{s.piPassBody.replace("{n}", n)}</p>
+        <ul className="perks">
+          {[s.perk1, s.perk2, s.perk3, s.perk4].map((p) => <li key={p}>✓ {p}</li>)}
+        </ul>
+        {!player?.piUid ? <p className="note">{s.piBrowserOnlyLong}</p> : (<>
+          {until && <p className="ok-msg">✅ {s.piPassActive.replace("{d}", day)}</p>}
+          <PiPay kind="pass30" amount={PASS_AMOUNT} primary={!until}
+            label={(until ? s.piPassRenew : s.piPassBuy).replace("{n}", n)} note={s.piPassNote}
+            doneText={`✅ ${s.piPassThanks}`} />
+          <PiPay kind="supporter" amount={SUPPORT_AMOUNT} label={`💛 ${s.piSupport.replace("{n}", String(SUPPORT_AMOUNT))}`}
+            note={s.piSupportNote} doneText={`💛 ${s.piThanks}`} done={!!player.piSupporterAt} />
+          <Link className="btn ghost" href="/">{s.backToBunker}</Link>
+        </>)}
       </div>
     );
   }
