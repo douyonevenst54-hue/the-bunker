@@ -13,6 +13,7 @@ npm run build
 # Bundle the room content so the test can build real answers.
 npx -y esbuild@0.25 lib/rooms/index.ts --bundle --format=esm --platform=node --outfile=.test-build/rooms.mjs --log-level=warning
 npx -y esbuild@0.25 lib/scenarios/index.ts --bundle --format=esm --platform=node --outfile=.test-build/scenarios.mjs --log-level=warning
+npx -y esbuild@0.25 lib/survival/index.ts --bundle --format=esm --platform=node --outfile=.test-build/survival.mjs --log-level=warning
 
 node tests/pi-mock.mjs > /tmp/pimock.log 2>&1 &
 PI_VALIDATION_KEY=test-validation-key PI_HOSTS=pi.buildthebunker.com,127.0.0.1 PI_API_BASE=http://localhost:3999 PI_API_KEY=test-pi-key PAYWALL=on STRIPE_WEBHOOK_SECRET=whsec_test_bunker ADMIN_EMAILS=admin@example.com EMAIL_DEV_LOG=1 APP_URL=http://localhost:3000 RESEND_API_KEY= PORT=3000 npm start > /tmp/next.log 2>&1 &

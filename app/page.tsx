@@ -102,6 +102,12 @@ export default async function Bunker() {
         {showUpgrade && <Link className="btn" href="/upgrade">💎 {s.upgrade}</Link>}
       </div>
 
+      <Link className="room scenario sv-card" href="/survival" style={{ marginTop: 18 }}>
+        <div className="ic">⏱️</div>
+        <div className="mid"><div className="t">{s.survivalTitle} <span className="sv-new">{s.survivalNew}</span></div><div className="s">{s.survivalSub}</div></div>
+        <div className="go">{s.survivalPlay}</div>
+      </Link>
+
       <div className="stage" style={{ marginTop: 18 }}>{s.levels}</div>
       {levels.map((lv) => {
         const sc = SCENARIOS.find((x) => x.id === lv.id)!;

@@ -317,6 +317,35 @@ ok(Number(sql("select count(*) from \\\"PasswordResetToken\\\" where \\\"created
 r = await g2.req("/api/auth/logout", { method: "POST" });
 ok(!g2.cookies.has("bunker_session"), "logout clears the session");
 
+// ---------- Step 18: 72-hour survival mode (free, guests included, scored on the server) ----------
+{
+  const { getSurvival, isLocked } = await import("../.test-build/survival.mjs");
+  const m = getSurvival("survival-72");
+  const fullKit = ["water3", "food3", "opener", "flashlight", "radio", "firstaid", "meds", "baby", "sanitation"];
+  const bestFor = (kit) => m.turns.map((t) => t.choices.findIndex((c) => c.outcome === "best" && !isLocked(c, kit)));
+  const sv = new Client();
+  let r = await sv.req("/survival");
+  ok(r.status === 200 && r.text.includes("72"), "survival page loads for a brand-new visitor");
+  ok((await sv.req("/")).text.includes("/survival"), "homepage links to the 72-hour survival mode");
+  r = await sv.req("/api/survival/survival-72/complete", { method: "POST", body: { kit: fullKit, answers: bestFor(fullKit) } });
+  ok(r.status === 200 && r.json?.result?.score === 100 && r.json?.result?.passed && r.json?.result?.hoursSurvived === 72, "a well-packed kit and safe choices score 100 and pass");
+  ok(r.json?.newBadges?.includes("survivor_72"), "passing earns the 72-Hour Survivor badge");
+  ok(sql(`select count(*) from \\"RoomAttempt\\" where \\"roomId\\" = 'survival-72'`) === "1", "the run is saved");
+  const tooBig = [...fullKit, "cash"];
+  ok((await sv.req("/api/survival/survival-72/complete", { method: "POST", body: { kit: tooBig, answers: bestFor(tooBig) } })).status === 400, "a kit over 12 slots is refused");
+  const noLight = fullKit.filter((k) => k !== "flashlight");
+  const cheat = bestFor(fullKit);
+  ok((await sv.req("/api/survival/survival-72/complete", { method: "POST", body: { kit: noLight, answers: cheat } })).status === 400, "a choice that needs an item you didn't pack is refused");
+  const unsafe = bestFor(fullKit);
+  unsafe[7] = m.turns[7].choices.findIndex((c) => c.outcome === "unsafe");
+  r = await sv.req("/api/survival/survival-72/complete", { method: "POST", body: { kit: fullKit, answers: unsafe } });
+  ok(r.status === 200 && !r.json?.result?.passed && r.json?.result?.criticalMisses?.length === 1, "running the generator in the garage is a critical error");
+  ok((await sv.req("/api/survival/survival-72/complete", { method: "POST", body: { kit: fullKit, answers: bestFor(fullKit).slice(0, 5) } })).status === 400, "a run can't stop early while the family is fine");
+  const pt = new Client();
+  r = await pt.req("/api/survival/survival-72/complete", { method: "POST", body: { kit: [], answers: bestFor([]).map((i, k) => i >= 0 ? i : m.turns[k].choices.findIndex((c) => c.outcome !== "unsafe" && !isLocked(c, []))).slice(0, 10) } });
+  ok(r.status === 200 && !r.json?.result?.survived && r.json?.result?.hoursSurvived < 72, "with an empty kit the family runs out of water and needs help before 72 hours");
+}
+
 // ---------- Step 17: Pi edition (pi.buildthebunker.com; 127.0.0.1 stands in for it here) ----------
 {
   const PI = BASE.replace("localhost", "127.0.0.1");

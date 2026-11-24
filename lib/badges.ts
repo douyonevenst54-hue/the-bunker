@@ -1,7 +1,7 @@
 import type { Tx } from "./rooms/types";
 import { SCENARIO_IDS } from "./scenarios/ids";
 
-const isScenario = (id: string) => (SCENARIO_IDS as readonly string[]).includes(id);
+const isScenario = (id: string) => (SCENARIO_IDS as readonly string[]).includes(id) || id.startsWith("survival-");
 
 /** What badge rules can look at: one entry per finished attempt, oldest first. */
 export interface AttemptLite {
@@ -81,6 +81,12 @@ export const BADGES: Badge[] = [
     name: { en: "Flood Survivor", ht: "Sivivan Inondasyon" },
     desc: { en: "Pass the Flood level", ht: "Reyisi nivo Inondasyon an" },
     earned: passedRoom("flood"),
+  },
+  {
+    id: "survivor_72", emoji: "⏱️",
+    name: { en: "72-Hour Survivor", ht: "Sivivan 72 Èdtan" },
+    desc: { en: "Get your family safely through the 72-hour survival mode", ht: "Fè fanmi ou travèse 72 èdtan an san danje" },
+    earned: passedRoom("survival-72"),
   },
   {
     id: "first_try", emoji: "🎯",
