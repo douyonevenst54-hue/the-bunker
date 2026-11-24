@@ -3,8 +3,9 @@ import { prisma, dbEnabled } from "@/lib/db";
 import { getPlayerId } from "@/lib/session";
 import { ROOMS } from "@/lib/rooms";
 import { SCENARIO_IDS } from "@/lib/scenarios/ids";
+import { SURVIVAL_IDS } from "@/lib/survival/ids";
 
-const IDS = new Set([...ROOMS.map((r) => r.id), ...SCENARIO_IDS]);
+const IDS = new Set([...ROOMS.map((r) => r.id), ...SCENARIO_IDS, ...SURVIVAL_IDS]);
 const KINDS = new Set(["start", "finish"]);
 const MODES = new Set(["2d", "3d", "level"]);
 const DEVICES = new Set(["phone", "desktop"]);
