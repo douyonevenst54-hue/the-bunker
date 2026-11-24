@@ -16,12 +16,22 @@ export const PI_SCOPES = ["username", "payments"];
 
 /** Initialise the SDK once; resolves to null when not in the Pi Browser. */
 let ready: Promise<PiSdk | null> | null = null;
+/** True when the app is open in Pi's developer sandbox (sandbox.minepi.com frames the Development URL). */
+function inPiSandbox(): boolean {
+  if (process.env.NEXT_PUBLIC_PI_SANDBOX === "true") return true;
+  try {
+    const anc = (window.location as Location & { ancestorOrigins?: DOMStringList }).ancestorOrigins;
+    if (anc && Array.from(anc).some((o) => o.startsWith("https://sandbox.minepi.com"))) return true;
+    return document.referrer.startsWith("https://sandbox.minepi.com");
+  } catch { return false; }
+}
+
 export function piSdk(): Promise<PiSdk | null> {
   if (ready) return ready;
   ready = (async () => {
     for (let i = 0; i < 10 && !window.Pi; i++) await new Promise((r) => setTimeout(r, 150));
     if (!window.Pi) return null;
-    try { await Promise.resolve(window.Pi.init({ version: "2.0", sandbox: process.env.NEXT_PUBLIC_PI_SANDBOX === "true" })); return window.Pi; }
+    try { await Promise.resolve(window.Pi.init({ version: "2.0", sandbox: inPiSandbox() })); return window.Pi; }
     catch { return null; }
   })();
   return ready;
