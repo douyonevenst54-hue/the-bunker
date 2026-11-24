@@ -4,7 +4,7 @@ import { getPlayer } from "@/lib/session";
 import { isPiEdition, piApiKey } from "@/lib/edition";
 
 const PI_API = process.env.PI_API_BASE ?? "https://api.minepi.com";
-import { SUPPORT_AMOUNT } from "@/lib/pi";
+import { PI_PRICES, extendPass } from "@/lib/pi";
 
 type PiPaymentDTO = {
   identifier: string; user_uid: string; amount: number | string; memo?: string;
@@ -26,14 +26,22 @@ async function pi(path: string, body?: unknown) {
   return r.json() as Promise<PiPaymentDTO>;
 }
 
+/** Records a finished payment and grants what was bought, exactly once per payment. */
 async function markComplete(p: PiPaymentDTO, txid: string) {
-  const owner = await prisma.player.findUnique({ where: { piUid: p.user_uid } });
-  await prisma.piPayment.upsert({
-    where: { paymentId: p.identifier },
-    create: { paymentId: p.identifier, piUid: p.user_uid, playerId: owner?.id ?? null, amount: Number(p.amount), kind: p.metadata?.kind ?? "supporter", status: "completed", txid },
-    update: { status: "completed", txid },
+  const kind = p.metadata?.kind ?? "supporter";
+  await prisma.$transaction(async (tx) => {
+    const prev = await tx.piPayment.findUnique({ where: { paymentId: p.identifier } });
+    if (prev?.status === "completed") return; // already granted
+    const owner = await tx.player.findUnique({ where: { piUid: p.user_uid } });
+    await tx.piPayment.upsert({
+      where: { paymentId: p.identifier },
+      create: { paymentId: p.identifier, piUid: p.user_uid, playerId: owner?.id ?? null, amount: Number(p.amount), kind, status: "completed", txid },
+      update: { status: "completed", txid },
+    });
+    if (!owner) return;
+    if (kind === "pass30") await tx.player.update({ where: { id: owner.id }, data: { piPassUntil: extendPass(owner.piPassUntil) } });
+    else if (!owner.piSupporterAt) await tx.player.update({ where: { id: owner.id }, data: { piSupporterAt: new Date() } });
   });
-  if (owner && !owner.piSupporterAt) await prisma.player.update({ where: { id: owner.id }, data: { piSupporterAt: new Date() } });
 }
 
 /**
@@ -65,11 +73,12 @@ export async function POST(req: Request) {
     if (p.user_uid !== player.piUid) return NextResponse.json({ error: "not_yours" }, { status: 403 });
 
     if (action === "approve") {
-      if (Number(p.amount) !== SUPPORT_AMOUNT || p.metadata?.kind !== "supporter") return NextResponse.json({ error: "bad_amount" }, { status: 400 });
+      const kind = String(p.metadata?.kind ?? "");
+      if (!(kind in PI_PRICES) || Number(p.amount) !== PI_PRICES[kind]) return NextResponse.json({ error: "bad_amount" }, { status: 400 });
       if (!p.status?.developer_approved) await pi(`${paymentId}/approve`, {});
       await prisma.piPayment.upsert({
         where: { paymentId },
-        create: { paymentId, piUid: p.user_uid, playerId: player.id, amount: Number(p.amount), kind: "supporter", status: "approved" },
+        create: { paymentId, piUid: p.user_uid, playerId: player.id, amount: Number(p.amount), kind, status: "approved" },
         update: {},
       });
       return NextResponse.json({ ok: true });
