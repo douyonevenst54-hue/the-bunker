@@ -4,6 +4,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 : "${DATABASE_URL:?set DATABASE_URL}"
+# 127.0.0.1 stands in for pi.buildthebunker.com (needed at build time too: next.config sets the framing headers)
+export PI_HOSTS="pi.buildthebunker.com,127.0.0.1"
 export AUTH_SECRET="${AUTH_SECRET:-test-secret-test-secret-test-secret-1234}"
 
 npx prisma migrate deploy
