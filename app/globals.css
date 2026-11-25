@@ -342,3 +342,21 @@ h3{font-family:Oswald,sans-serif;font-size:18px;margin-bottom:6px}
 .sv-notes{margin:6px 0 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
 .sv-notes li{font-size:13px;line-height:1.4;background:var(--panel2);border-radius:8px;padding:8px 10px}
 .tl-t small{color:var(--muted)}
+
+/* 72-Hour Challenge */
+.ch-link{display:block;margin:8px 2px 0;font:600 13px Inter;color:var(--amber);text-decoration:none}
+.ch-tabs{display:flex;gap:6px;margin-bottom:12px}
+.ch-tabs button{flex:1;background:var(--panel2);border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:9px;font:600 14px Inter;cursor:pointer}
+.ch-tabs button.on{background:var(--amber);border-color:var(--amber);color:#1a1205}
+.ch-board{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.ch-board li{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:8px;background:var(--panel2);border-radius:10px;padding:9px 12px;font-size:14px}
+.ch-board li.me{outline:1px solid var(--amber);background:rgba(242,169,59,.1)}
+.ch-r{font:700 14px Inter;color:var(--muted);text-align:center}
+.ch-n small{color:var(--muted)}
+.ch-board b{font:700 16px Inter}
+.ch-board b small{font:500 12px Inter;color:var(--muted)}
+.ch-form{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;margin:10px 0}
+.ch-form label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.ch-form input{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px;font:500 15px Inter}
+.ch-form .btn{margin:0;width:auto;padding:10px 16px}
+.ch-code{font:700 18px Inter;letter-spacing:.15em;color:var(--amber)}
