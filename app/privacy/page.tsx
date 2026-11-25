@@ -23,7 +23,7 @@ export default function Privacy() {
       <ul>
         <li><b>Playing as a guest:</b> a random ID in a cookie, and your answers, scores and badges. No name or email.</li>
         <li><b>With an account:</b> your email, an optional first name, and a securely hashed password (we never store the password itself).</li>
-        <li><b>Pi edition (pi.buildthebunker.com):</b> when you sign in with Pi, we receive your Pi username and a Pi user ID from Pi Network, nothing else.
+        <li><b>Pi edition (pi.buildthebunker.com):</b> when you sign in with Pi, we receive your Pi username and a Pi user ID from Pi Network, nothing else. If you choose to watch an optional ad, Pi Network shows it; we only receive a confirmation that it was watched.
           We do not ask for your wallet address and never ask for your passphrase. If you choose to support the game in Pi, we keep the payment ID, amount and transaction ID.</li>
         <li><b>Membership:</b> Stripe processes payments. We receive your Stripe customer ID and subscription status, never your card number.</li>
         <li><b>Emails:</b> we send password-reset emails through Resend.</li>

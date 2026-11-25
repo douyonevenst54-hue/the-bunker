@@ -29,6 +29,8 @@ model Player {
   piSupporterAt DateTime?
   /// Bunker Pass (Pi edition): rooms 3–6 and the levels are open until this date.
   piPassUntil  DateTime?
+  /// Pi edition: after one verified rewarded ad, Room 3 is open until this time (24 hours, once a day).
+  adRoomUntil  DateTime?
   /// Public name on the 72-Hour Challenge leaderboard (never the real name or email).
   nickname     String?
   /// The player's crew (async team) for the 72-Hour Challenge.
@@ -181,4 +183,13 @@ model PiPayment {
   updatedAt DateTime @updatedAt
 
   @@index([playerId])
+}
+
+/// One row per verified Pi rewarded ad: an ad id can grant a reward only once.
+model AdReward {
+  adId      String   @id
+  playerId  String
+  createdAt DateTime @default(now())
+
+  @@index([playerId, createdAt])
 }

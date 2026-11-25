@@ -5,6 +5,7 @@ import { getPlayer } from "@/lib/session";
 import { billingReady, isMember } from "@/lib/plan";
 import BillingButtons from "@/components/BillingButtons";
 import PiPay from "@/components/PiPay";
+import PiAdUnlock from "@/components/PiAdUnlock";
 import { isPiEdition } from "@/lib/edition";
 import { SUPPORT_AMOUNT, PASS_AMOUNT } from "@/lib/pi";
 
@@ -34,6 +35,7 @@ export default async function UpgradePage({ searchParams }: { searchParams: Prom
           <PiPay kind="pass30" amount={PASS_AMOUNT} primary={!until}
             label={(until ? s.piPassRenew : s.piPassBuy).replace("{n}", n)} note={s.piPassNote}
             doneText={`✅ ${s.piPassThanks}`} />
+          {!until && <PiAdUnlock until={player.adRoomUntil && player.adRoomUntil > new Date() ? player.adRoomUntil.toISOString() : null} />}
           <PiPay kind="supporter" amount={SUPPORT_AMOUNT} label={`💛 ${s.piSupport.replace("{n}", String(SUPPORT_AMOUNT))}`}
             note={s.piSupportNote} doneText={`💛 ${s.piThanks}`} done={!!player.piSupporterAt} />
           <Link className="btn ghost" href="/">{s.backToBunker}</Link>

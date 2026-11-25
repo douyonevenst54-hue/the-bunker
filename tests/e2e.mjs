@@ -409,6 +409,24 @@ ok(!g2.cookies.has("bunker_session"), "logout clears the session");
   r = await pc.req("/room/security");
   ok(r.status === 307 && r.location?.endsWith("/upgrade"), "Pi edition: room 3 needs the Bunker Pass");
   {
+    const ad = new Client(PI);
+    ok((await ad.req("/api/pi/ads", { method: "POST", body: { adId: "ad-good-1" } })).status === 401, "rewarded ads need Pi sign-in");
+    await ad.req("/api/auth/pi", { method: "POST", body: { accessToken: "pi-good-u7" } });
+    await ad.req("/api/rooms/water/complete", { method: "POST", body: { answers: perfect(water) } });
+    await ad.req("/api/rooms/medical/complete", { method: "POST", body: { answers: perfect(ROOMS.find((x) => x.id === "medical")) } });
+    ok((await ad.req("/api/pi/ads", { method: "POST", body: { adId: "ad-fake-1" } })).status === 402, "an ad Pi didn't confirm as watched gives nothing");
+    r = await ad.req("/room/security");
+    ok(r.status === 307 && r.location?.endsWith("/upgrade"), "room 3 still needs the Pass without the ad");
+    ok((await ad.req("/api/pi/ads", { method: "POST", body: { adId: "ad-good-1" } })).status === 200, "a verified rewarded ad is accepted");
+    ok((await ad.req("/room/security")).status === 200, "after the ad, room 3 opens");
+    ok((await ad.req("/api/rooms/food/complete", { method: "POST", body: { answers: perfect(ROOMS.find((x) => x.id === "food")) } })).status === 402, "the ad opens room 3 only, not rooms 4–6");
+    ok((await ad.req("/api/pi/ads", { method: "POST", body: { adId: "ad-good-2" } })).status === 429, "only one rewarded ad per day");
+    const other = new Client(PI);
+    await other.req("/api/auth/pi", { method: "POST", body: { accessToken: "pi-good-u8" } });
+    ok((await other.req("/api/pi/ads", { method: "POST", body: { adId: "ad-good-1" } })).status === 409, "the same ad can't be reused by someone else");
+    ok((await new Client().req("/api/pi/ads", { method: "POST", body: { adId: "ad-good-3" } })).status === 404, "no ads on the main site");
+  }
+  {
     const g = new Client(PI);
     ok((await g.req("/api/auth/register", { method: "POST", body: { email: "pi-x@example.com", password: "longpassword1" } })).status === 404, "Pi edition: email sign-up is off (Pi sign-in only)");
     ok((await g.req("/api/auth/login", { method: "POST", body: { email: "pi-x@example.com", password: "longpassword1" } })).status === 404, "Pi edition: email login is off");
