@@ -24,7 +24,7 @@ const U = {
     passed: "Safe and ready", notPassed: "You made it, but it was risky", failed: "Needed rescue",
     critical: "Critical safety errors", criticalBody: "In real life these choices can kill. Read why below and try again.",
     packed: "What you packed", missed: "Worth packing next time", timeline: "Your 72 hours", review: "Rooms to review",
-    again: "Play again", back: "Back to my bunker", saving: "Saving…", saved: "Saved", notSaved: "Not saved (you can still play)",
+    again: "Play again", board: "🏆 This week's 72-Hour Challenge", back: "Back to my bunker", saving: "Saving…", saved: "Saved", notSaved: "Not saved (you can still play)",
     newBadges: "New badge!", sources: "Sources", share: "Share my result",
     shareText: "My family survived 72 hours in THE BUNKER. Could yours? 🏕️",
     note: "A game for learning. In a real emergency, follow local officials and call 911.",
@@ -39,7 +39,7 @@ const U = {
     passed: "An sekirite epi pare", notPassed: "Nou rive, men te gen danje", failed: "Te bezwen sekou",
     critical: "Erè grav pou sekirite", criticalBody: "Nan lavi reyèl, chwa sa yo ka touye. Li poukisa anba a epi eseye ankò.",
     packed: "Sa ou te pran", missed: "Sa ki ta bon pou pran pwochen fwa", timeline: "72 èdtan ou yo", review: "Chanm pou revize",
-    again: "Jwe ankò", back: "Retounen nan bunker mwen", saving: "Ap sove…", saved: "Sove", notSaved: "Pa sove (ou ka kontinye jwe)",
+    again: "Jwe ankò", board: "🏆 Defi 72 Èdtan semèn sa a", back: "Retounen nan bunker mwen", saving: "Ap sove…", saved: "Sove", notSaved: "Pa sove (ou ka kontinye jwe)",
     newBadges: "Nouvo badj!", sources: "Sous", share: "Pataje rezilta mwen",
     shareText: "Fanmi mwen siviv 72 èdtan nan THE BUNKER. E pa w? 🏕️",
     note: "Se yon jwèt pou aprann. Nan yon vrè ijans, swiv otorite lokal yo epi rele 911.",
@@ -252,7 +252,8 @@ export default function SurvivalGame({ mode }: { mode: SurvivalMode }) {
       </>)}
       <div className="status">{save === "saving" ? u.saving : save === "saved" ? u.saved : u.notSaved}</div>
       {r.survived && save === "saved" && <ShareButton label={u.share} text={u.shareText} />}
-      <button className="btn" onClick={restart}>{u.again}</button>
+      <Link className="btn" href="/challenge">{u.board}</Link>
+      <button className="btn ghost" onClick={restart}>{u.again}</button>
       <Link className="btn ghost" href="/">{u.back}</Link>
       <p className="note">{u.note}</p>
       <div className="src">{u.sources}<br />

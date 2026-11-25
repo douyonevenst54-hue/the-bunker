@@ -29,6 +29,11 @@ model Player {
   piSupporterAt DateTime?
   /// Bunker Pass (Pi edition): rooms 3–6 and the levels are open until this date.
   piPassUntil  DateTime?
+  /// Public name on the 72-Hour Challenge leaderboard (never the real name or email).
+  nickname     String?
+  /// The player's crew (async team) for the 72-Hour Challenge.
+  crewId       String?
+  crew         Crew?          @relation(fields: [crewId], references: [id], onDelete: SetNull)
   piPayments   PiPayment[]
   subStatus    String?
   subInterval  String?
@@ -41,6 +46,8 @@ model Player {
   revisionsAuthored ContentRevision[] @relation("author")
   revisionsReviewed ContentRevision[] @relation("reviewer")
   signoffs     ContentSignoff[]
+
+  @@index([crewId])
 }
 
 /// Every finished playthrough of a room, scored on the server.
@@ -57,6 +64,17 @@ model RoomAttempt {
   createdAt      DateTime @default(now())
 
   @@index([playerId, roomId])
+  @@index([roomId, createdAt])
+}
+
+/// A crew: an async team. Members play the 72-hour mode on their own time; the top 5 weekly scores add up.
+model Crew {
+  id          String   @id @default(cuid())
+  name        String
+  code        String   @unique
+  createdById String
+  createdAt   DateTime @default(now())
+  members     Player[]
 }
 
 /// Best result per player per room. Drives unlocking.

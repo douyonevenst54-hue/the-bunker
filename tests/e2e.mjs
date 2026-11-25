@@ -346,6 +346,40 @@ ok(!g2.cookies.has("bunker_session"), "logout clears the session");
   ok(r.status === 200 && !r.json?.result?.survived && r.json?.result?.hoursSurvived < 72, "with an empty kit the family runs out of water and needs help before 72 hours");
 }
 
+// ---------- Step 19: 72-Hour Challenge — weekly leaderboard, nicknames, crews (async teams) ----------
+{
+  const { getSurvival, isLocked } = await import("../.test-build/survival.mjs");
+  const m = getSurvival("survival-72");
+  const kit = ["water3", "food3", "opener", "flashlight", "radio", "firstaid", "meds", "baby", "sanitation"];
+  const bestA = m.turns.map((t) => t.choices.findIndex((c) => c.outcome === "best" && !isLocked(c, kit)));
+  const poorA = bestA.map((b, i) => { const k = m.turns[i].choices.findIndex((c) => c.outcome === "poor" && !isLocked(c, kit)); return i % 3 === 0 && k >= 0 ? k : b; });
+  const play = (c, answers) => c.req("/api/survival/survival-72/complete", { method: "POST", body: { kit, answers } });
+  const post = (c, body) => c.req("/api/challenge", { method: "POST", body });
+  const a = new Client(), b = new Client(), z = new Client();
+  ok((await post(a, { action: "nickname", nickname: "Lakay Lynn" })).status === 200, "a player can pick a public nickname");
+  ok((await post(a, { action: "nickname", nickname: "x" })).json?.error === "errName", "too-short nicknames are refused");
+  ok((await post(a, { action: "nickname", nickname: "Sh1t head" })).json?.error === "errName", "rude nicknames are refused");
+  ok((await post(a, { action: "nickname", nickname: "<script>" })).json?.error === "errName", "nicknames can't contain code");
+  let r = await post(a, { action: "create", name: "Douyon Family" });
+  const code = r.json?.code;
+  ok(r.status === 200 && /^[A-Z0-9]{6}$/.test(code || ""), "creating a crew gives a 6-character invite code");
+  ok((await post(a, { action: "create", name: "Second Crew" })).json?.error === "errInCrew", "a player can be in only one crew");
+  r = await b.req(`/crew/${code.toLowerCase()}`);
+  ok(r.status === 200 && r.text.includes("Douyon Family"), "the invite link shows the crew (code is case-insensitive)");
+  ok((await b.req("/crew/ZZZZZZ")).status === 404, "unknown invite codes are 404");
+  ok((await post(b, { action: "join", code: "nope00" })).status === 404, "joining needs a real code");
+  ok((await post(b, { action: "join", code })).status === 200, "a second player joins with the code");
+  await play(a, bestA); await play(a, poorA); await play(b, poorA);
+  const bScore = (await play(z, poorA)).json?.result?.score;
+  r = await a.req("/challenge");
+  ok(r.status === 200 && r.text.includes("Lakay Lynn") && r.text.includes("Douyon Family"), "the leaderboard shows nicknames and crews");
+  ok(!r.text.includes("@example.com"), "the leaderboard never shows emails");
+  ok(r.text.includes(String(100 + bScore)), "a crew's score adds up its members' best scores this week");
+  ok(/Survivor [A-Z0-9]{4}/.test(r.text), "players without a nickname get an anonymous name");
+  ok((await post(b, { action: "leave" })).status === 200 && (await post(a, { action: "leave" })).status === 200, "members can leave");
+  ok(sql(`select count(*) from \\"Crew\\" where \\"code\\" = '${code}'`) === "0", "an empty crew is removed");
+}
+
 // ---------- Step 17: Pi edition (pi.buildthebunker.com; 127.0.0.1 stands in for it here) ----------
 {
   const PI = BASE.replace("localhost", "127.0.0.1");
