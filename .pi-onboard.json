@@ -1,0 +1,8 @@
+{
+  "app_id": "6b064048a066b3ec61e137c7",
+  "host_network": "mainnet",
+  "frontend_url": "https://pi.buildthebunker.com",
+  "pi_url": "https://thebunker2783.pinet.com",
+  "testnet_app_id": "6b05ce28642483ff25c9b007",
+  "testnet_frontend_url": "https://testnet.buildthebunker.com"
+}
