@@ -10,6 +10,11 @@ http.createServer(async (req, res) => {
     return m ? json(res, 200, { uid: m[1], username: `pioneer_${m[1]}` }) : json(res, 401, { error: "invalid" });
   }
   if (url === "/__seed" && req.method === "POST") { const p = JSON.parse(body); payments.set(p.identifier, p); return json(res, 200, { ok: true }); }
+  const ad = /^\/v2\/ads_network\/status\/([A-Za-z0-9_-]+)$/.exec(url);
+  if (ad) {
+    if (req.headers.authorization !== "Key test-pi-key") return json(res, 401, { error: "bad key" });
+    return json(res, 200, { identifier: ad[1], mediator_ack_status: ad[1].startsWith("ad-good") ? "granted" : "not_granted" });
+  }
   const pm = /^\/v2\/payments\/([A-Za-z0-9_-]+)(?:\/(approve|complete|cancel))?$/.exec(url);
   if (pm) {
     if (req.headers.authorization !== "Key test-pi-key") return json(res, 401, { error: "bad key" });
